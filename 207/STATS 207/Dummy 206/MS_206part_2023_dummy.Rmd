@@ -1,0 +1,44 @@
+---
+title: "MS Comp. Exam 2023: 206 Part (Dummy Exam)"
+output:
+  html_document: default
+---
+
+
+
+**Instruction**:  <br>
+In this question, you will be aked to perform some tasks in R.  Please submit the codes and plots along with your answers. You should submit an .html file. 
+
+
+**Question**: <br>
+In *dummy.Rdata* you will find a data set called *data* with two variables, *V1, V2*. Please first load the data into the R workspace. **Please then**: <br>
+ i. Obtain mean and variance for each variable. <br>
+ ii. Draw a histgram for each variable and briefly comment on its distribution. <br> 
+ 
+ 
+ i.) 
+```{r}
+load("dummy.RData")
+V1 <- data$V1
+V2 <- data$V2
+
+print(mean(V1))
+print(var(V1))
+
+print(mean(V2))
+print(var(V2))
+```
+
+ii.) 
+```{r}
+hist(V1)
+```
+
+We see that V1 might have a bimodal distribution. 
+
+```{r}
+hist(V2)
+```
+
+It's hard to tell exactly the distribution. This may be a constant distribution. Or a truncated normal curve with
+specified boundaries. 

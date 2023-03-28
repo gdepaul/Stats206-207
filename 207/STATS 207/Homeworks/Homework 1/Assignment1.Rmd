@@ -1,0 +1,240 @@
+---
+title: "STA 207: Assignment I"
+author: "Greg DePaul (917835494)"
+output: html_document
+---
+***
+
+**Instructions** You may adapt the code in the course materials or any sources (e.g., the Internet, classmates, friends). In fact, you can craft solutions for almost all questions from the course materials with minor modifications. However, you need to write up your own solutions and acknowledge all sources that you have cited in the Acknowledgement section. 
+
+Failing to acknowledge any non-original efforts will be counted as plagiarism. This incidence will be reported to the Student Judicial Affairs. 
+
+*** 
+
+
+A consulting firm is investigating the relationship between wages and occupation. The file `Wage.csv` contains three columns, which are 
+
+  - `wage`, the wage of the subject,
+  - `ethnicity`, the ethnicity of the subject,
+  - and `occupation`, the occupation of the subject. 
+  
+We will only use `wage` and `occupation` in this assignment. 
+
+
+```{r,echo=T,results=F,message=F}
+Wage=read.csv('Wage.csv');
+library(gplots)
+library(car)
+library(DescTools)
+attach(Wage)
+```
+
+
+***
+
+(1) Write down a one-way ANOVA model for this data. For consistency, choose the letters from $\{Y,\alpha, \mu, \epsilon\}$ and use the factor-effect form. 
+
+	
+	The one-way ANOVA model will be of the form 
+	
+	$$Y_{i,j} = \mu + \alpha_{i} + \epsilon_{i,j}$$
+	for 
+	$1 \leq i \leq r, 1 \leq j \leq n_i$ and $\epsilon_{i,j} \sim N(0, \sigma^2).$ Further, we make the assumption that 
+	
+	$$\sum_{i = 1}^r n_i \alpha = 0$$
+	
+***
+
+(2)  Write down the least squares estimator of $\alpha_i$ for all $i$. Find the expectation and variance of this estimate in terms of $\{n_i\}$ and the parameters of the model. 
+
+
+  We know the least squares estimator will be (as stated in the notes): Let $n_T = \sum_{i = 1}^r n_i.$ Then we want to identify our estimators by taking the derivative of our least squares potential function:
+  
+ $$ \underset{\mu, \alpha_i}{\operatorname{argmin}} \{ L_1(\mu, \alpha) \}$$
+  
+  
+  We can identify the estimators by analytically optimizing: 
+
+$$0 = \frac{ L_1(\mu, \alpha)}{\partial \alpha_i} = -\sum_{j = 1}^{n_i} 2(Y_{i,j} - (\mu + \alpha_i)) = -2 \sum_{j = 1}^{n_i} Y_{i,j} + 2\sum_{j = 1}^{n_i} (\mu + \alpha_i) $$
+
+$$\iff 2 \sum_{j = 1}^{n_i} Y_{i,j} = 2\sum_{j = 1}^{n_i} (\mu + \alpha_i) $$
+$$\iff  \sum_{j = 1}^{n_i} Y_{i,j} = \sum_{j = 1}^{n_i} (\mu + \alpha_i)  = n_i (\mu + \alpha_i)$$
+$$\implies \mu + \alpha_i = \frac{1}{n_i}\sum_{j = 1}^{n_i} Y_{i,j}$$
+$$\implies \alpha_i = \frac{1}{n_i}\sum_{j = 1}^{n_i} Y_{i,j} - \mu$$
+
+
+$$0 = \frac{\partial L_1(\mu, \alpha)}{\partial \mu} = -\sum_{i = 1}^r \sum_{j = 1}^{n_i} 2 (Y_{i,j} - (\mu + \alpha_i)) = - 2 \sum_{i = 1}^r \sum_{j = 1}^{n_i} Y_{i,j} + 2 \sum_{i = 1}^r \sum_{j = 1}^{n_i}(\mu + \alpha_i)$$
+$$= -2 \sum_{i = 1}^r \sum_{j = 1}^{n_i} Y_{i,j} + 2 \sum_{i = 1}^r \sum_{j = 1}^{n_i}(\mu + \alpha_i) = -2 \sum_{i = 1}^r \sum_{j = 1}^{n_i} Y_{i,j} + 2 \sum_{i = 1}^r n_i (\mu + \alpha_i) =  -2 \sum_{i = 1}^r \sum_{j = 1}^{n_i} Y_{i,j} + 2 n_T \mu + 2\sum_{i = 1}^r n_i  \alpha_i$$
+
+$$\iff 2 n_T \mu + 2\sum_{i = 1}^r n_i  \alpha_i = 2 \sum_{i = 1}^r \sum_{j = 1}^{n_i} Y_{i,j}$$
+$$\iff n_T \mu + \sum_{i = 1}^r n_i  \alpha_i = \sum_{i = 1}^r \sum_{j = 1}^{n_i} Y_{i,j}$$
+
+Applying the constraint $\sum_{i = 1}^r n_i \alpha_i = 0,$ then we see that: 
+$$\implies n_T \mu = \sum_{i = 1}^r \sum_{j = 1}^{n_i} Y_{i,j}$$
+
+
+$$\implies \mu = \frac{1}{n_T} \sum_{i = 1}^r \sum_{j = 1}^{n_i} Y_{i,j} =  \sum_{i = 1}^r \frac{1}{n_T} \frac{n_i}{n_i} \sum_{j = 1}^{n_i} Y_{i,j} =  \sum_{i = 1}^r \frac{n_i}{n_T} \overline{Y_i}$$
+
+So our least-squares estimators will be: 
+
+
+$$\hat \mu = \sum_{i = 1}^r \frac{n_i}{n_T} \overline{Y}_i$$ 
+$$\implies \hat \alpha_i = \overline{Y}_i - \hat{\mu}$$
+Since $\epsilon_{i,j} \sim N(0,\sigma^2),$ then it follows that
+
+$$E \left [ \hat \mu \right ] = E\left [\sum_{i = 1}^r \frac{n_i}{n_T} \overline{Y}_i \right ] = \sum_{i = 1}^r \frac{1}{n_T} E\left [ n_i \overline{Y}_i \right ] = \frac{1}{n_T} \sum_{i = 1}^r \sum_{j = 1}^{n_i} E\left [ Y_{i,j} \right ] = \frac{1}{n_T} \sum_{i = 1}^r \sum_{j = 1}^{n_i} (\mu + \alpha_i) = \mu + \underbrace{\frac{1}{n_T} \sum_{i = 1}^r n_i \alpha_i}_{= 0} = \mu$$
+
+
+ $$E[\alpha_i] = E[ \overline{Y}_i - \hat{\mu}] = \mu_i - \mu = \alpha_i$$
+ 
+ Now, recall for every $\overline{Y_i} \sim N(\mu_i, \frac{\sigma^2}{n_i})$ and are independent for each $i$, then we see that 
+ 
+ $$Var(\hat \mu) = Var \left (\frac{1}{n_T} \sum_{i = 1}^r \sum_{j = 1}^{n_i}Y_{i,j} \right ) = \frac{1}{n_T^2} \sum_{i = 1}^r  \left ( \frac{\sigma^2}{n_i} \right) = \frac{\sigma^2}{n_T}$$
+ 
+  $$Var(\hat \alpha) = Var \left ( \overline{Y_i} - \frac{1}{n_T} \sum_{i = 1}^r n_i \overline{Y_i} \right ) = \left (1 - \frac{n_i}{n_T} \right)^2 Var(\overline{Y_i})  + \sum_{k \not = i} \frac{n_k^2}{n_T^2} Var(\overline{Y_k})$$ 
+  $$= \left (1 - \frac{n_i}{n_T} \right)^2 \frac{\sigma^2}{n_i} + \sum_{k \not = i} \frac{n_k^2}{n_T^2} \frac{\sigma^2}{n_k} = \left ( \frac{1}{n_i}  - \frac{1}{n_T}\right) \sigma^2$$
+ 
+
+(3) Obtain the main effects plots. Summarize your findings.
+
+*** 
+```{r}
+plotmeans(wage ~ occupation, data = Wage, 
+          xlab = "Occupation", ylab = "Wage",
+          main="Main effect of Occupation")
+```
+
+(4) Set up the ANOVA table using `R` for your model. Briefly explain this table.   
+	
+*** 
+
+```{r}
+res.aov <- aov(wage ~ occupation, data = Wage)
+summary(res.aov)
+```
+
+(5) Test whether there is any association between `occupation` and `wage`. In particular, you need to (a) define the null and alternative hypotheses using the notation in Part 1, (b) conduct the test, and (c) explain your test result. 
+
+(a) Suppose that occupation has no effect on wage. Then it would follow that the effect terms would be zero. Therefore, we formulate the null and alternative hypotheses to be: 
+
+$$H_0 : \alpha_1 = \alpha_2 = \ldots = \alpha_r = 0$$
+$$H_A : \text{not all } a_i \text{ are zero}$$
+
+(b) As stated in problem 4, and our F-statistic is 23.22, which has a $p$-value of 2e-16. Therefore, we see that we satisfy for any reasonable critical value the ability to reject our null hypothesis. 
+
+(c) By rejecting the null hypothesis, we conclude that occupation does has an association on wage. 
+
+*** 
+
+(6) For the model fitted in Part 4, carry out the necessary diagnostics to check if the model assumptions given in Part 1 are valid. What are your findings?
+
+*** 
+
+```{r}
+par(mfrow=c(2,2))
+plot(res.aov)
+```
+
+It's very obvious that there are 3 outliers which should be removed if we are to get accurate results for our Bartlett and Levene Tests for homogeneity. Specifically: 
+
+```{r}
+outliers <- c(107, 410, 171, 231)
+outliers_removed <- Wage[-outliers]
+head(outliers_removed)
+```
+
+We perform the test for homogeneity of variances.  
+```{r}
+print(bartlett.test(wage ~ occupation, data = outliers_removed))
+print(leveneTest(wage ~ occupation, data = outliers_removed))
+```
+Both p-values from Bartlett’s and Levene’s tests are less than the significance level of 0.05. This indicates that there is evidence of significantly unequal variances of error terms. This inspires doubt as to the treatment of data collection for these different groups of professions. It could be some professions may be more forthcoming with this wage information than others. 
+
+
+We also check for normality, we see that we have no scepticism about any departure from normality: 
+
+```{r}
+aov_residuals <- residuals(object = res.aov)
+shapiro.test(x = aov_residuals )
+```
+
+
+(7) Assuming that the assumptions you made are true, can you statistically conclude if there is one occupation where the mean wage is the highest? Use the most appropriate method (use $\alpha=0.05$) to support your statement.
+
+
+
+$$H_0 : \alpha_1 = \alpha_2, \alpha_2 = \alpha_3, \alpha_1 = \alpha_3, \ldots, \alpha_5 = \alpha_6$$
+To test simultaneous inference, we have access to several tests. 
+
+```{r}
+print(pairwise.t.test(Wage$wage, Wage$occupation, p.adjust.method="bonferroni"))
+
+TukeyHSD(res.aov)
+
+ScheffeTest(res.aov)
+```
+
+Acknowledging these three tests, we see that there is no conclusive rejection of the notion that technical versus managerial occupations have different mean values. Therefore, we cannot conclude that there is one occupation where the mean wage is the highest. 
+
+*** 
+
+
+(8) Consider a one-way ANOVA model with fixed effects 
+\begin{equation}\label{eqn:anova}
+Y_{i,j}=\mu + \alpha_i+ \epsilon_{i,j}, \ j=1,\ldots, n_i, i =1,\ldots, r,
+\end{equation}
+where $\{ \alpha_i\}$ satisfies that $\sum_{i} n_i \alpha_i=0$ and $\{\epsilon_{i,j}\}$ are i.i.d. $N(0,\sigma^2)$.  For the above model, write down the loss function associated with least squares, denoted as $L_1(\mu,\alpha)$, and write down the log-likelihood, denoted as $L_2(\mu,\alpha)$.
+
+
+$$L_1(\mu, \alpha) = \sum_{i = 1}^r \sum_{j = 1}^{n_i} (Y_{i,j} - \mu - \alpha_i)_2^2$$
+
+To derive the likelihood function, we first need to consider the distribution: 
+
+$$Y_{i,j} = \mu + \alpha_i + \epsilon_{i,j} \sim N(\mu + \alpha_i, \sigma^2)$$
+
+Then, for every instance, we want to maximize the likelihood: 
+
+$$\text{Likelihood} = \prod_{i = 1}^r \prod_{j = 1}^{n_i} f(Y_{i,j};\mu, \alpha) = \prod_{i = 1}^r \prod_{j = 1}^{n_i} \frac{1}{\sigma \sqrt{2\pi}} e^{-\frac{1}{2} \left ( \frac{Y_{i,j} - (\mu + \alpha_i)}{\sigma} \right)^2}$$
+
+$$\implies \log \text{Likelihood} = \sum_{i = 1}^r \sum_{j = 1}^{n_i} -\frac{1}{2} \left ( \frac{Y_{i,j} - (\mu + \alpha_i)}{\sigma} \right)^2 - \log(\sigma \sqrt{2 \pi})$$
+
+$$= -\frac{1}{2 \sigma^2} \sum_{i = 1}^r \sum_{j = 1}^{n_i} \left ( Y_{i,j} - (\mu + \alpha_i) \right)^2 - \sum_{i = 1}^r \sum_{j = 1}^{n_i} \log(\sigma \sqrt{2 \pi})$$
+
+***
+
+(9) Find the maximum likelihood estimator of $\mu$ and $\alpha$ using the log-likelihood $L_2(\mu,\alpha)$ in Question 8. 
+
+
+Observe, we are identifying the estimators $\mu, \alpha_i$ subject to the maximization problem: 
+
+$$ \underset{\mu, \alpha}{\operatorname{argmax}}  \{ L_2(\mu, \alpha) \}$$
+
+$$\iff \underset{\mu, \alpha}{\operatorname{argmax}} \left \{ -\frac{1}{2 \sigma^2} \sum_{i = 1}^r \sum_{j = 1}^{n_i} \left ( Y_{i,j} - (\mu + \alpha_i) \right)^2 - \sum_{i = 1}^r \sum_{j = 1}^{n_i} \log(\sigma \sqrt{2 \pi}) \right \}$$
+
+Clearly linear transformations can be applied and yield the same estimators. Firstly, the translate can be removed: 
+
+$$\iff \underset{\mu, \alpha}{\operatorname{argmax}} \left \{ -\frac{1}{2 \sigma^2} \sum_{i = 1}^r \sum_{j = 1}^{n_i} \left ( Y_{i,j} - (\mu + \alpha_i) \right)^2  \right \}$$
+And the scale parameter can be removed as well since $\alpha_i$ and $\mu$ do not rely on $\sigma$:
+
+$$\iff \underset{\mu, \alpha}{\operatorname{argmax}} \left \{ -\sum_{i = 1}^r \sum_{j = 1}^{n_i} \left ( Y_{i,j} - (\mu + \alpha_i) \right)^2  \right \}$$
+
+Lastly, taking the dual with respect to the negative changes the problem to a minimization problem: 
+
+$$\iff \underset{\mu, \alpha}{\operatorname{argmin}} \left \{ \sum_{i = 1}^r \sum_{j = 1}^{n_i} \left ( Y_{i,j} - (\mu + \alpha_i) \right)^2  \right \}$$
+Clearly, we see that this is exactly: 
+
+$$\iff \underset{\mu, \alpha_i}{\operatorname{argmin}} \{ L_1(\mu, \alpha) \}$$
+
+Since these are equivalent, we realize that the maximum likelihood estimators are equivalent to those derived in question 2! So: 
+
+$$\hat \mu_{MLE} = \sum_{i = 1}^r \frac{n_i}{n_T} \overline{Y}_i$$
+$$\hat \alpha_{i, MLE} =  \overline{Y}_i - \hat{\mu}$$
+
+## Acknowledgement {-}
+
+Extensive usage of the course notes (Chapter4ANOVA) as well as the discussion notes. Otherwise, all work presented is my own. 
+
+## Session information {-}
+```{r}
+sessionInfo()
+```

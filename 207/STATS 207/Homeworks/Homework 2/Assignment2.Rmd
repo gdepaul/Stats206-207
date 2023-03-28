@@ -1,0 +1,271 @@
+---
+title: "STA 207: Assignment II"
+author: "Greg DePaul (917835494)"
+output: html_document
+---
+***
+
+**Instructions** You may adapt the code in the course materials or any sources (e.g., the Internet, classmates, friends). In fact, you can craft solutions for almost all questions from the course materials with minor modifications. However, you need to write up your own solutions and acknowledge all sources that you have cited in the Acknowledgement section. 
+
+Failing to acknowledge any non-original efforts will be counted as plagiarism. This incidence will be reported to the Student Judicial Affairs. 
+
+***
+
+A consulting firm is investigating the relationship between wages and some demographic factors. The file `Wage.csv` contains three columns, which are 
+
+  - `wage`, the wage of the subject,
+  - `ethnicity`, the ethnicity of the subject,
+  - and `occupation`, the occupation of the subject. 
+
+
+```{r,echo=T,results=F,message=F}
+Wage=read.csv('Wage.csv');
+library(gplots)
+library(lme4)
+attach(Wage)
+```
+
+***
+
+(1) Write down a two-way ANOVA model for this data. For consistency, choose the letters from $\{Y,\alpha, \beta, \mu, \epsilon\}$ and use the factor-effect form. 
+
+The two-way ANOVA model is as follows: 
+
+$$Y_{i,j,k} = \mu + \alpha_i + \beta_j + (\alpha \beta)_{i,j}  + \epsilon_{i,j,k}$$
+over the cells enumerated as: 
+
+$$1 \leq i \leq a, \ \ \ 1 \leq j \leq b, \ \ \ 1 \leq i \leq n_{i,j}$$
+
+subject to the constraints: 
+
+$$n_{\cdot, j} = \sum_{i = 1}^{a} n_{i,j} \ \ \ \forall j$$
+
+$$n_{i, \cdot} = \sum_{j = 1}^{b} n_{i,j} \ \ \ \forall i$$
+
+$$\sum_{i = 1}^a n_{i, \cdot} \alpha_i = 0$$
+$$\sum_{j = 1}^b n_{\cdot, j} \beta_j = 0$$
+
+$$\sum_{i = 1}^a n_{i,j} (\alpha\beta)_{i,j} = 0 \text{ for all } j$$
+
+$$\sum_{j = 1}^b n_{i,j} (\alpha\beta)_{i,j} = 0 \text{ for all } i$$
+
+***
+
+(2) Obtain the main effects plots and the interaction plot. Summarize your findings.
+	
+```{r, warning = FALSE}
+
+#par(mfrow=c(2,2))
+
+white_wages = Wage$wage[Wage$ethnicity == "cauc"]
+white_occupations = Wage$occupation[Wage$ethnicity == "cauc"]
+
+plotmeans(white_wages ~ white_occupations, 
+          xlab = "Occupations for White", ylab = "Wage",
+          main="Main effect of Occupation for White")
+
+hisp_wages = Wage$wage[Wage$ethnicity == "hispanic"]
+hisp_occupations = Wage$occupation[Wage$ethnicity == "hispanic"]
+
+plotmeans(hisp_wages ~ hisp_occupations, 
+          xlab = "Occupations for Hispanic", ylab = "Wage",
+          main="Main effect of Occupatio for Hispanicn")
+
+other_wages = Wage$wage[Wage$ethnicity == "other"]
+other_occupations = Wage$occupation[Wage$ethnicity == "other"]
+
+plotmeans(other_wages ~ other_occupations, 
+          xlab = "Occupations for Other", ylab = "Wage",
+          main="Main effect of Occupation for Other")
+
+interaction.plot(Wage$occupation, Wage$ethnicity, Wage$wage
+                ,cex.lab=1.5,ylab="Wage",xlab='Occuptations')
+```
+	
+	
+
+We see that for four of the six occupations, there is a trend: caucasian is the highest paid, followed by other, and hispanic as last. The only positions that deviate are sales and services. But the bulk of the recorded datapoints are for white individuals. 
+	
+***	
+	
+(3) Fit the ANOVA model described in Part 1. Obtain the ANOVA table and state your conclusions. Are the findings here consistent with your initial assessments from Part 2?
+
+	
+```{r}
+full_model=lm(wage~as.factor(occupation)+as.factor(ethnicity)+as.factor(occupation)*as.factor(ethnicity),data=Wage)
+anova(full_model)
+```
+	
+	The relationship between occupation and wage is very strong. This relationship does a good job of hiding disparities in equity. It's not clear that ethnicity has any impact on wage, even though the plot above indicates otherwise. 
+	
+***	
+
+(4) Carry out a test to decide if the  effect of ethnicity is present on the full data set, at the significance level $\alpha=0.01$. 
+
+We see by the summary table above that the p-value is 0.1165, which doesn't exceed our desired significance level, is not considered significant to indicate the effect of ethnicity. But this could indicate the conservative nature of the statistic. If we consider the first order reduced model, we see: 
+
+```{r}
+reduced_model=lm(wage~as.factor(occupation)+as.factor(ethnicity),data=Wage)
+summary(reduced_model)
+```
+
+We still see on the reduced model that we don't have a strong enoguh p-value to justify the significance of ethnicity. But this could be due to the severe lack of datapoints for ethnicity.
+	
+***	
+
+(5) For this part and the next, assume that the occupations have been selected randomly. Write down an appropriate ANOVA model that is additive in the factors and explain the terms in the model.
+	
+	
+```{r}
+my_wage = Wage$wage
+my_occupation = as.factor(Wage$occupation)
+my_ethnicity = as.factor(Wage$ethnicity)
+
+full_model=lmer(my_wage ~ my_ethnicity + (1 | my_occupation))
+summary(full_model)
+```
+	
+
+***
+
+(6) Assuming that the model in Part 5 is appropriate, obtain an estimate of the proportion of variability that is due to variability in occupation.
+
+$$\text{proportion of variability} = \frac{\sigma_{\mu}^2}{\sigma_{\mu}^2 + \sigma^2} = \frac{6.205}{6.205 + 21.760} = 0.2219 \approx 0.22$$
+
+So we estimate the proportion of variability to be about 22%
+	
+*** 
+
+(7) 
+Consider a two-way ANOVA model with fixed effects 
+\begin{equation}\label{eqn:anova_two}
+Y_{i,j,k}=\mu + \alpha_i+ \beta_j+\epsilon_{i,j,k}, \  i =1,\ldots, a, j=1,\ldots, b, k=1,\ldots, n
+\end{equation}
+where $\{ \alpha_i\}$ satisfies that $\sum_{i}^a  \alpha_i=0$, $\{\beta_j\}$ satisfies that $\sum_{j}^b  \beta_j=0$,  and $\{\epsilon_{i,j,k}\}$ are i.i.d. $N(0,\sigma^2)$. Derive the least squares estimator from the above equation. 
+
+
+First we define the least squares potential function as: 
+
+
+$$L_1(\mu, \alpha, \beta) = \sum_{i = 1}^a \sum_{j = 1}^b \sum_{k = 1}^{n_{i,j}} (Y_{i,j,k} - \mu - \alpha_i - \beta_j)^2$$
+
+Then we want to identify our estimators by taking the derivative of our least squares potential function:
+  
+ $$ \underset{\mu, \alpha_i, \beta_j}{\operatorname{argmin}} \{ L_1(\mu, \alpha, \beta) \}$$
+  
+  
+  We can identify the estimators by analytically optimizing: 
+
+$$0 = \frac{ L_1(\mu, \alpha, \beta)}{\partial \alpha_i} = - \sum_{j = 1}^b \sum_{k = 1}^{n_{i,j}} 2(Y_{i,j,k} - \mu - \alpha_i - \beta_j ) $$
+
+$$\iff 2 \sum_{j = 1}^b \sum_{k = 1}^{n_{i,j}} Y_{i,j,k} = 2 \sum_{j = 1}^b \sum_{k = 1}^{n_{i,j}} (\mu + \alpha_i + \beta_j ) $$
+$$\iff \sum_{j = 1}^b \sum_{k = 1}^{n_{i,j}} Y_{i,j,k} = \sum_{j = 1}^b n_{i,j} (\mu + \alpha_i + \beta_j ) = n_{i, \cdot}(\mu + \alpha_i) + \sum_{j = 1}^b n_{i,j} \beta_j = n_{i, \cdot}(\mu + \alpha_i)$$
+
+$$\mu + \alpha_i = \frac{1}{n_{i, \cdot}} \sum_{j = 1}^b \sum_{k = 1}^{n_{i,j}} Y_{i,j,k}$$
+
+Similarly, differentiating with respect of $\beta_j$:
+
+$$0 = \frac{ L_1(\mu, \alpha, \beta)}{\partial \beta_j} = - \sum_{i = 1}^a \sum_{k = 1}^{n_{i,j}} 2(Y_{i,j,k} - \mu - \alpha_i - \beta_j ) $$
+
+$$\iff 2 \sum_{i = 1}^a \sum_{k = 1}^{n_{i,j}} Y_{i,j,k} = 2 \sum_{1 = 1}^a \sum_{k = 1}^{n_{i,j}} (\mu + \alpha_i + \beta_j ) $$
+
+$$\iff \sum_{i = 1}^a \sum_{k = 1}^{n_{i,j}} Y_{i,j,k} = \sum_{i = 1}^a n_{i,j} (\mu + \alpha_i + \beta_j ) = n_{\cdot, j}(\mu + \beta_j) + \sum_{i = 1}^a n_{i,j} \alpha_i = n_{\cdot, j}(\mu + \beta_j)$$
+
+$$\mu + \beta_j = \frac{1}{n_{\cdot, j}} \sum_{i = 1}^a \sum_{k = 1}^{n_{i,j}} Y_{i,j,k}$$
+
+Lastly, differentiating with respect of $\mu$:
+
+
+$$0 = \frac{ L_1(\mu, \alpha, \beta)}{\partial \beta_j} = - \sum_{i = 1}^a \sum_{j = 1}^b \sum_{k = 1}^{n_{i,j}} 2(Y_{i,j,k} - \mu - \alpha_i - \beta_j ) $$
+
+$$\iff \sum_{i = 1}^a \sum_{j = 1}^b \sum_{k = 1}^{n_{i,j}} Y_{i,j,k}  = \sum_{i = 1}^a \sum_{j = 1}^b \sum_{k = 1}^{n_{i,j}} (\mu + \alpha_i + \beta_j ) = n_T \mu + \sum_{i = 1}^a n_{i, \cdot} \alpha_i + \sum_{j = 1}^b n_{\cdot, j} \beta_j = n_T \mu$$
+
+This gives us the final estimators:
+
+$$\implies \hat \mu = \frac{1}{n_T} \sum_{i = 1}^a \sum_{j = 1}^b \sum_{k = 1}^{n_{i,j}} Y_{i,j,k}$$
+
+$$\implies \hat \alpha_i =\frac{1}{n_{i, \cdot}} \sum_{j = 1}^b \sum_{k = 1}^{n_{i,j}} Y_{i,j,k} - \hat \mu$$
+
+$$\implies \hat \beta_j = \frac{1}{n_{\cdot, j}} \sum_{i = 1}^a \sum_{k = 1}^{n_{i,j}} Y_{i,j,k} - \hat \mu$$
+
+
+***
+
+(8)
+Consider the following models 
+\begin{equation}\label{eqn:cellmeans}
+Y_{i,j,k}=\mu_{i,j}+\epsilon_{i,j,k}, \ k=1,\ldots, n, i =1,\ldots, a, j=1,\ldots, b, 
+\end{equation}
+and 
+\begin{equation}\label{eqn:reg}
+Y_{i,j,k}= \sum_{l=1}^a \sum_{m=1}^b \beta_{l,m} X_{l,m;i,j,k}+\epsilon_{i,j,k}, \ k=1,\ldots, n, i =1,\ldots, a, j=1,\ldots, b,
+\end{equation}
+where $\{\epsilon_{i,j,k}\}$ are i.i.d. $N(0,\sigma^2)$ and $X_{l,m;i,j,k}=1$ when $(l,m)=(i,j)$ and $X_{l,m;i,j,k}=0$ otherwise. Express $\{\beta_{l,m}: l=1,\ldots, a; m=1,\ldots, b\}$ using $\{\mu_{i,j}: i=1,\ldots, a; j=1,\ldots, b\}$.
+
+Observe: 
+
+\begin{align*}
+\mu_{i,j} &= \sum_{l=1}^a \sum_{m=1}^b \beta_{l,m} X_{l,m;i,j,k} \\
+&= \beta_{i,j} X_{i,j;i,j,k} + \underbrace{\sum \sum \beta_{l,m} X_{l,m;i,j,k}}_{(l,m) \not = (i,j)}\\
+&= \beta_{i,j} X_{i,j;i,j,k} + 0\\
+&= \beta_{i,j} 
+\end{align*}
+
+***
+
+(9) 
+With some abuse of notation, we rewrite the regression model as 
+\begin{equation}\label{eqn:reg_new}
+Y= X\beta + \epsilon,
+\end{equation}
+where $Y$ is a $n_T$-dimensional vector, $X$ is an $n_T \times p$ matrix, $\beta$ is a $p$-dimensional vector, and $\{\epsilon\} \sim {\rm MVN}(0, \sigma^2 {\rm I})$, i.e., multivariate normal with covariance matrix $\sigma^2 {\rm I}$. Express the residual sum of squares and explained sum of squares in $Y$ and $X$, and then show that these two sum of squares are independent. 
+
+\newcommand{\indep}{\perp \!\!\! \perp}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+We can rewrite the residual sum of squares and explained sum of squares as the following functions: 
+
+$$SSE = Y^T (I - X(X^TX)^{-1}X^T) Y = e^Te$$
+
+$$SSR = Y^T (X(X^TX)^{-1}X^T - \frac{1}{n_T} 1 \cdot 1^T) Y = g(\hat \beta, \hat Y)$$
+Observe, 
+\begin{align*}
+Cov(e, \hat Y) &= Cov((I - X(X^TX)^{-1}X^T) Y, X(X^TX)^{-1}X^TY) \\
+&= (I - X(X^TX)^{-1}X^T) \sigma^2(Y) (X(X^TX)^{-1}X^T)^T\\ 
+&= (I - X(X^TX)^{-1}X^T) \sigma^2(Y) X(X^TX)^{-1}X^T \\
+&= \sigma^2(Y) (I - X(X^TX)^{-1}X^T  X(X^TX)^{-1}X^T  & \text{since }  \sigma^2(Y) = \sigma^2 I \\
+&=  \sigma^2(Y)(X(X^TX)^{-1}X^T - (X(X^TX)^{-1}X^T)^2) \\
+&=   \sigma^2(Y)(X(X^TX)^{-1}X^T - X(X^TX)^{-1}X^T) \\
+&= 0
+\end{align*}
+
+\begin{align*}
+Cov(e, \hat \beta) &= Cov((I - X(X^TX)^{-1}X^T)Y, (X^TX)^{-1}X^T Y) \\
+&= (I - X(X^TX)^{-1}X^T)\sigma^2(Y)X(X^TX)^{-T} & \text{since }  \sigma^2(Y) = \sigma^2 I \\
+&=\sigma^2(Y) (I - X(X^TX)^{-1} X^T)X(X^TX)^{-T} \\
+&=\sigma^2(Y) (X(X^TX)^{-T} - X(X^TX)^{-T}) \\
+&= 0
+\end{align*}
+
+Now, we define the function:
+$$SSE = f(e) = e^Te = \norm{(I - X(X^TX)^{-1}X^T)Y}_2^2$$
+Therefore, if we let $g = id : \mathbb R^n \rightarrow \mathbb R$, then we see that by the fact that if two sets of random variables, say $(Z_1, \ldots, Z_s)$ and $(W_1,\ldots ,W_t)$, are independent with each other, then their functions, say $f(Z_1, \ldots, Z_s)$ and $g(W_1, \ldots , W_t)$, are independent, then it must follow that 
+
+$$e \indep \hat \beta \implies f(e) \indep g(\hat \beta) \implies SSE \indep \hat \beta$$
+
+Similarly, consider the function:
+
+$$SSR = g(\hat \beta, \hat Y) = \norm{(X(X^TX)^{-1}X^T - \frac{1}{n_T} 1 \cdot 1^T)Y}_2^2 = \sum_{i = 1}^n (\hat Y_i - \overline{Y})^2$$
+
+Then it must follow that 
+
+$$e \indep \hat \beta \text{ and } \hat Y \implies f(e) \indep g(\hat \beta, \hat Y) \implies SSE \indep SSR$$
+
+## Acknowledgement {-}
+
+I appreciate the Piazza comments that helped me complete this homework assignment.  
+
+## Session information {-}
+```{r}
+sessionInfo()
+```

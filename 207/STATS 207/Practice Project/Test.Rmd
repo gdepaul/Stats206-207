@@ -1,0 +1,92 @@
+---
+title: "Tester"
+output: html_document
+date: "2023-02-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(haven)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r read_data, include=FALSE}
+students <- read_sav("STAR_Students.sav")
+high_schools <- read_sav("STAR_High_Schools.sav")
+elementary_schools <- read_sav("STAR_K-3_Schools.sav")
+```
+
+
+```{r specific_columns}
+students_cleaned <- students%>%dplyr::select(g1tmathss, g1classtype, g1schid, g1tchid)%>%mutate(na.count=rowSums(is.na(.))) 
+students_cleaned <- students_cleaned%>%na.omit()%>%dplyr::select(-na.count) # drop rows with missing data
+head(students_cleaned)
+
+model1 = aov(g1tmathss ~ g1classtype + g1schid, data = students_cleaned)
+summary(model1)
+model2 <- aov(g1tmathss ~ g1classtype * g1schid, data = students_cleaned)
+summary(model2)
+```
+
+```{r perform_joins}
+complete_data <- students
+#complete_data <- inner_join(students, elementary_schools, by=c('gkschid'='schid'), suffix = c("", "_k"))
+#complete_data <- inner_join(complete_data, elementary_schools, by=c('g1schid'='schid'), suffix = c("", "_1"))
+#complete_data <- inner_join(complete_data, elementary_schools, by=c('g2schid'='schid'), suffix = c("", "_2"))
+#complete_data <- inner_join(complete_data, elementary_schools, by=c('g3schid'='schid'), suffix = c("", "_3"))
+#complete_data <- inner_join(complete_data, elementary_schools, by=c('g4schid'='schid'), suffix = c("", "_4"))
+#complete_data <- inner_join(complete_data, elementary_schools, by=c('g5schid'='schid'), suffix = c("", "_5"))
+#complete_data <- inner_join(complete_data, elementary_schools, by=c('g6schid'='schid'), suffix = c("", "_6"))
+#complete_data <- inner_join(complete_data, elementary_schools, by=c('g7schid'='schid'), suffix = c("", "_7"))
+#complete_data <- inner_join(complete_data, elementary_schools, by=c('g8schid'='schid'), suffix = c("", "_8"))
+#complete_data <- inner_join(complete_data, high_schools, by=c('hsid'='hsid'), suffix = c("", "_hs"))
+
+complete_data[1,"g1classtype"]
+
+#complete_data[1,"gktchid"]
+
+
+#complete_data[1,"g1tmathss"]
+
+#complete_data[1,"g1mathbsraw"]
+
+#complete_data[1,"g1mathbsobjraw"]
+
+
+#complete_data[1,"g1mathbsobjpct"]
+#complete_data %>% group_by(g1schid) %>% summarise(math_median = median(g1tmathss), math_mean = mean(g1tmathss), reading_median = median(g1treadss), reading_mean = mean(g1treadss), n = n())
+
+# Outcome v.s. class types
+#ggplot(complete_data, aes(g1tmathss, )) + geom_boxplot()
+
+boxplot(complete_data$g1tmathss ~ complete_data$gktchid,main='Teacher versus Math Score',
+xlab='School',ylab='Math Score',col=rainbow(4))
+
+print(length(unique(complete_data$g1schid)))
+
+
+
+#Outcome v.s. school IDs
+
+```
+
+
+```{r model_sat}
+target_vars <- c("hsact","hstest","hssatmath","hssatverbal","hssattot","hsactcomp", "hsacttot", "hsactenglish", "hsactmath", "hsactread", "hsactscience", "hssatconverted", "hsactconverted", "hsgrdadd", "hsgrdcol")
+df_sat <- complete_data[,!(names(complete_data) %in% target_vars)]
+df_sat <- df_sat[!is.na(df_sat$hssat),]
+
+#anova.fit <- aov(hssat ~ ., data = df_sat)
+# Summary
+#summary(anova.fit)
+
+```
+

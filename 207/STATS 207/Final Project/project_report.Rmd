@@ -1,0 +1,255 @@
+---
+title: "Course Project Description"
+date: " "
+output: html_document
+---
+
+```{r,echo=F,results=F,message=F}
+library(keras)
+library(mlbench)
+library(dplyr)
+library(magrittr)
+library(neuralnet)
+library(matrixStats)
+library(lme4)
+library(sigmoid)
+library(tidyverse)
+library(reticulate)
+
+use_condaenv("pythruR", required = TRUE)
+```
+
+## Overview
+
+This document contains instructions on the **course project** for STA 207 Winter 2023. This document is made with `R markdown`. The `rmd` file to generate this document is available on the course website. 
+
+Background análisis:
+•	Write your own background 
+•	Justify the statistic used 
+•	Questions of Interest
+o	What does it mean to have a random intercept? 
+o	What exactly are the hypothesis testing ¿ - Full model versus reduced model
+o	Application of Tuley-Kramer confindence Interval? – Not necessary and doesn’t answer the question
+o	Is the average firing rate the only kind of response the only kind of response that we are allowed to use? 
+o	Is it necessary to conduct model diagonostics for logistic regression? 
+o	Is it necessary to use multople classification algorithms in addition to glm (LDA, XGBOOST, .l..) 
+•	Common Issues
+
+
+# Defining Reasonable Summary Statistics
+
+Five sessions of observed samples were collected on the following mice and dates: 
+
+```{r echo=FALSE, eval=TRUE}
+session=list()
+for(i in 1:5){
+  session[[i]]=readRDS(paste('./Data/session',i,'.rds',sep=''))
+  print(session[[i]]$mouse_name)
+  print(session[[i]]$date_exp)
+  
+}
+```
+
+Five variables are available for each trial, namely 
+
+- `feedback_type`: type of the feedback, 1 for success and -1 for failure
+- `contrast_left`: contrast of the left stimulus
+- `contrast_right`: contrast of the right stimulus
+- `time`: centers of the time bins for `spks`  
+- `spks`: numbers of spikes of neurons in the visual cortex in time bins defined in `time`
+
+In order to transform this sequence problem into an approachable one within the scope of this course, 
+we use summary statistics on the neuron firing rate. We introduce the following summary statistics:
+
+- `minimum_firing_rate`:
+- `lower_quartile_firing_rate`:
+- `median_firing_rate`:
+- `upper_quartile_firing_rate`:
+- `maximum_firing_rate`:
+- `mean_firing_rate`:
+
+This is then collated into a dataframe, list below: 
+
+```{r echo=TRUE, eval=TRUE}
+
+
+my_data <- data.frame(matrix(ncol = 83, nrow = 0))
+my_data_colnames <- c('session', 'trial','contrast_left', 'contrast_right')
+
+for (t in 1:39) {
+  my_data_colnames <- append(my_data_colnames, paste("mean_at_", t, sep=""))
+}
+
+for (t in 1:39) {
+  my_data_colnames <- append(my_data_colnames, paste("max_at_", t, sep=""))
+}
+
+my_data_colnames <- append(my_data_colnames, "feedback")
+
+colnames(my_data) <- my_data_colnames
+
+for(t in 1:5){
+  for(id in 1:length(session[[t]]$feedback_type)) {
+    curr_feedback <- session[[1]]$feedback_type[id]
+    curr_left_contract <- session[[t]]$contrast_left[id]
+    curr_right_contract <- session[[t]]$contrast_right[id]
+
+    # define test statistics here
+    my_dims <- dim(session[[t]]$spks[[id]])
+
+    M <- session[[t]]$spks[[id]]
+
+    mean_response_over_time <- rowMeans(t(M))
+
+    max_response_over_time <- rowMaxs(t(M))
+    
+    curr_result <- append(mean_response_over_time, max_response_over_time)
+    
+    row_info <- c(t, id, curr_left_contract, curr_right_contract)
+    curr_result <- append(row_info, curr_result)
+    
+    if(is.na(curr_feedback)) {
+      curr_feedback <- 0
+    }
+
+    my_data[nrow(my_data) + 1,] = append(curr_result, curr_feedback)
+  }
+}
+head(my_data)
+
+
+print(Sys.info()[["machine"]])
+
+```
+
+
+# Exploratory Data Analysis
+
+- Descriptive analysis. Explore the dataset and generate summary statistics and plots that you find informative, and explain your findings. Additionally, you should explicitly address the unique feature of this dataset, which is that each session contains varying numbers of neurons. An important task in this analysis is to define the outcome variable. One suggested approach is to use the mean firing rate, which is calculated as, for each trial, the average number of spikes per second across all neurons within a given 0.4 seconds time interval. However, even if this suggestion is followed, it is crucial that your report contains justification of this choice.
+
+
+
+```{r echo=TRUE, eval=TRUE}
+# hist(my_data$min_response)
+# hist(my_data$lower_quartile_response)
+# hist(my_data$median_response)
+# hist(my_data$upper_quartile_response)
+# hist(my_data$max_response)
+# hist(my_data$mean_response)
+# hist(my_data$feedback)
+# 
+# 
+# panel.cor <- function(x, y){
+#   par(usr = c(0, 1, 0, 1))
+#   r <- round(cor(x, y, use="complete.obs"), 2)
+#   txt <- paste0("R = ", r)
+#   cex.cor <- 0.8/strwidth(txt)
+#   text(0.5, 0.5, txt, cex = cex.cor * r)
+# }
+# 
+# left_constrast <- my_data$contrast_left
+# right_constrast <- my_data$contrast_right
+# min_response <- my_data$min_response
+# lower_response <- my_data$lower_quartile_response
+# median_response <- my_data$median_response
+# upper_response <- my_data$upper_quartile_response
+# max_response <- my_data$max_response
+# mean_response <- my_data$mean_response
+# feedback <- my_data$feedback
+#pairs(~ feedback + ., lower.panel = panel.cor)
+```
+
+# Inferential Analysis
+
+Split into Train and Test
+```{r echo=TRUE, eval=TRUE} 
+train_data <- my_data[101:nrow(my_data),]
+test_data <- my_data[1:100,]
+
+```
+
+
+- Inferential analysis (Q1). 
+Consider a  mixed effect model where the two fixed-effect factors are left contrast and right contrast, and a random intercept is included for each session. As a result, Q1 reduces to test the null hypothesis that the two factors have no interaction effect. 
+
+```{r echo=TRUE, eval=TRUE} 
+rand_effects_mod <- lmer(feedback ~ contrast_left + contrast_right  + (1 | session), data = train_data)
+summary(rand_effects_mod)
+# 
+# fit.all <- lm(feedback ~ ., train_data)
+# 
+# null <- lm(feedback ~ 1, train_data ) 
+# 
+# step(null, scope=list(lower=null, upper=fit.all), 
+#     criterion = "BIC", direction="both", k = log(nrow(train_data)))
+
+```
+
+
+- Sensitivity analysis (Q1). Conduct model diagnostics and/or sensitivity analysis. In addition to the regular diagnostics, you should examine whether one need to account for the random effects from sessions. You may also explore using other statistics as outcomes.
+
+- Predictive modeling (Q2). Make sure that you do not use the first 100 trials in Session 1 in model training. 
+
+```{r echo=TRUE, eval=TRUE} 
+
+
+fmla_str <- "feedback ~ contrast_left + contrast_right +"
+xnam <- paste("mean_at_", 1:39, sep="")
+total_vars <- paste(xnam, collapse= " + ")
+
+xnam <- paste("max_at_", 1:39, sep="")
+total_vars_2 <- paste(xnam, collapse= " + ")
+
+total_vars <- paste(total_vars,total_vars_2, sep=" + ")
+
+fmla_str <- paste(fmla_str, total_vars)
+
+fmla <- as.formula(fmla_str)
+
+#nn <- neuralnet(dividend ~ fcfps + earnings_growth + de + mcap + current_ratio, data=trainset, hidden=c(2,1), linear.output=FALSE, threshold=0.01)
+
+```
+
+
+
+
+```{r echo=TRUE, eval=TRUE} 
+
+#y_hat <- round(compute(n, test_data)$net.result)
+
+#print(mean(abs(y_hat - test_data$feedback)))
+
+# 
+# plot(n,col.hidden = 'darkgreen',     
+# col.hidden.synapse = 'darkgreen',
+#      show.weights = F,
+#      information = F,
+#      fill = 'lightblue')
+
+# fit.all <- glm(fmla, data = train_data, family="binomial")
+# 
+# null <- glm(feedback ~ 1, train_data, family="binomial")
+# 
+# step(null , scope=list(lower=null, upper=fit.all), 
+#     criterion = "BIC", direction="both", k = log(nrow(train_data)))
+
+#prediction_model <- glm(fmla, data = train_data)
+
+#summary(prediction_model)
+# 
+# #print(plogis(predict(prediction_model, test_data)))
+# 
+# y_hat <- round(predict(prediction_model, test_data))
+# # 
+# print(mean(abs(y_hat - test_data$feedback)))
+
+```
+
+This means we get 31% of the test wrong, giving a 69% success rate for prediction. 
+
+# Reference {-}
+
+
+Steinmetz, N.A., Zatka-Haas, P., Carandini, M. et al. Distributed coding of choice, action and engagement across the mouse brain. Nature 576, 266–273 (2019). https://doi.org/10.1038/s41586-019-1787-x
+
+

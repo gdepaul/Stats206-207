@@ -1,0 +1,367 @@
+---
+title: "Validating the impact of Class Size on Test Performance "
+author: "Greg DePaul"
+date: "17 February 2023"
+output:
+  html_document:
+    df_print: paged
+    number_sections: yes
+---
+```{r global_options, include=FALSE}
+library('AER')
+library(haven)
+library(dplyr)
+library(tidyverse)
+library(gtsummary)
+library(ggplot2)
+library(qwraps2)
+library(nortest)
+options(qwraps2_markup = "markdown")
+library(car)
+library(MASS)
+library(DescTools)
+knitr::opts_chunk$set(fig.pos = 'H')
+```
+
+# Abstract 
+
+We explore the connection between class room setting versus math test score performance. 
+
+# Introduction and Background
+
+ The Tennessee Student Achievement Ratio project was a four year study, collecting a broad range of statistics for 7000 students in 79 elementary schools. These statistics caputure a variety of information, ranging from the instructional background of these teachers, the test score performance of each student, as well as information about the classroom setting for each individual student. Several conclusions have since been released after the mass distribution of this dataset. One conclusion, in particular, argues that 
+ 
+ "Nashville-Davidson County students who attended small classes (K-3) consistently made better grades than students in regular and regular/aide classes by the end of the 1994-1995 school year. In English, math, and science, the students in the small classes outscored their counterparts by over 10 points." [Harvard dataverse](https://dataverse.harvard.edu/dataset.xhtml?persistentId=hdl:1902.1/10766)
+ 
+ The goal of this project is to verify these results using some of the statistical tools taught in UC Davis's Stats 207 course. Specifically: 
+ 
+- Q1: Does class size have an impact on score performance?
+ 
+ But a follow up to this question is naturally, can we disregard the school to make this assertion? So we also formulate the question: 
+ 
+- Q2: Does school have an impact on score performance?
+
+Note, by the design of this experiment, we make the assumption that these two are sample in such a way that an interaction between these would be spurious and therefore discount such considerations. So we will stay within the additive domain for this analysis.
+
+# Exploratory Data Analysis 
+
+In this section, we explore the feature variables as well as some of their multivariate relationships. The variables of interest are as follows: 
+
+* g1tmathss: total math scaled score in 1st grade.
+* class_types: factor indicating the class type in 1st grade: small (1), regular (2), or regular-with-aide (3).
+* g1schid: factor indicating school id
+* gktchid: factor indicating teacher id
+
+```{r, include = FALSE}
+students <- read_sav("STAR_Students.sav")
+```
+
+## Summary Statistics on Feature Variables
+
+We take a look at the summary statistics for the variables of interest: 
+
+```{r, include=FALSE}
+
+our_summary1 <-
+  list("Math Scores" =
+       list("min"       = ~ min(g1tmathss, na.rm = TRUE),
+            "25% quantiles" = ~ quantile(g1tmathss, na.rm = TRUE)[2],
+            "median" = ~ quantile(g1tmathss, na.rm = TRUE)[3],
+            "mean" = ~ mean(g1tmathss, na.rm = TRUE),
+            "75% quantiles" = ~ quantile(g1tmathss, na.rm = TRUE)[4],
+            "max"       = ~ max(g1tmathss, na.rm = TRUE),
+            "# NA" = ~ sum(is.na(g1tmathss))
+       ),
+       "Class Type" =
+       list("Small"       = ~ qwraps2::n_perc0(g1classtype == 1, na_rm = TRUE),
+            "Regular"    = ~ qwraps2::n_perc0(g1classtype == 2, na_rm = TRUE),
+            "Regular with Aide"       = ~ qwraps2::n_perc0(g1classtype == 3, na_rm = TRUE),
+            "# NA" = ~ sum(is.na(g1classtype))
+       ),
+       "School Info" =
+       list("Num Schools" = ~ length(unique(g1schid)),
+            "Fewest Samples per School" = ~ min(table(g1schid)),
+            "Highest Samples per School" = ~ max(table(g1schid)),
+            "# NA" = ~ sum(is.na(g1schid))
+       ),
+       "Teacher Info" =
+       list("Num Teachers" = ~ length(unique(g1tchid)),
+            "Fewest Samples per Teacher" = ~ min(table(g1tchid)),
+            "Highest Samples per Teacher" = ~ max(table(g1tchid)),
+            "# NA" = ~ sum(is.na(g1tchid))
+       )
+  )
+
+summary_table(students, our_summary1)
+
+```
+
+
+ 
+ 
+ |                                         |students (N = 11,601) |
+ |:----------------------------------------|:---------------------|
+ |**Math Scores**                          |&nbsp;&nbsp;          |
+ |&nbsp;&nbsp; min                         |404                   |
+ |&nbsp;&nbsp; 25% quantiles               |500                   |
+ |&nbsp;&nbsp; median                      |529                   |
+ |&nbsp;&nbsp; mean                        |530.527887238557      |
+ |&nbsp;&nbsp; 75% quantiles               |557                   |
+ |&nbsp;&nbsp; max                         |676                   |
+ |&nbsp;&nbsp; # NA                        |5003                  |
+ |**Class Type**                           |&nbsp;&nbsp;          |
+ |&nbsp;&nbsp; Small                       |1,925 (28)            |
+ |&nbsp;&nbsp; Regular                     |2,584 (38)            |
+ |&nbsp;&nbsp; Regular with Aide           |2,320 (34)            |
+ |&nbsp;&nbsp; # NA                        |4772                  |
+ |**School Info**                          |&nbsp;&nbsp;          |
+ |&nbsp;&nbsp; Num Schools                 |77                    |
+ |&nbsp;&nbsp; Fewest Samples per School   |47                    |
+ |&nbsp;&nbsp; Highest Samples per School  |238                   |
+ |&nbsp;&nbsp; # NA                        |4772                  |
+ |**Teacher Info**                         |&nbsp;&nbsp;          |
+ |&nbsp;&nbsp; Num Teachers                |340                   |
+ |&nbsp;&nbsp; Fewest Samples per Teacher  |12                    |
+ |&nbsp;&nbsp; Highest Samples per Teacher |30                    |
+ |&nbsp;&nbsp; # NA                        |4772                  |
+
+## Aggregating per School
+
+We can see that if we don't aggregate at the teacher level, and simply consider all students simultaneously, these are the distribution curves that we face. Recall that some of these teachers will only have 12 students to be able to draw meaningful conclusions on. This could be an issue depending on the summary statistic. For example, if we were to use the mean to evaluate a teacher's performance, this can be highly susceptible to outliers because the mean is a nonrobust statistic. 
+
+```{r, echo=FALSE}
+
+hist(students$g1tmathss)
+
+boxplot(students$g1tmathss ~ students$gktchid,main='Teacher versus Math Score',
+xlab='School',ylab='Math Score',col=rainbow(4))
+```
+
+So instead we turn to aggregate our data. As a sanity check, we see that after aggregating over teachers and taking the mean score of their students, we don't see too great a departure from the histogram above of all students versus the histogram over median scores. This suggests that it is perfectly reasonable to continue this analysis using these aggregated statistics. 
+
+Now, looking at the relationships between math score versus school and math score, versus class type, we see that there are interesting relationships to explore. 
+
+```{r, echo=FALSE}
+
+students_cleaned <- students%>%dplyr::select(g1tmathss, g1classtype, g1schid, g1tchid)%>%mutate(na.count=rowSums(is.na(.))) 
+students_cleaned <- students_cleaned%>%na.omit()%>%dplyr::select(-na.count) # drop rows with missing data
+
+students_cleaned <- students_cleaned %>% group_by(g1classtype, g1schid, g1tchid) %>% 
+  summarise(median_score=median(g1tmathss),
+            .groups = 'drop')
+
+hist(students_cleaned$median_score)
+
+students_cleaned$g1classtype=as.factor(students_cleaned$g1classtype)
+students_cleaned$g1schid=as.factor(students_cleaned$g1schid)
+
+boxplot(students_cleaned$median_score ~ students_cleaned$g1schid,main='School versus Math Score',
+xlab='School',ylab='Math Score',col=rainbow(4))
+
+boxplot(students_cleaned$median_score ~ students_cleaned$g1classtype,main='Class Type versus Math Score',
+xlab='Class Type',ylab='Math Score',col=rainbow(4))
+
+```
+
+Firstly, we see that the scores vary wildly by school. This suggests that schools themselves play a significant part in determining student performance. 
+
+We also see that students in smaller classrooms tend to do much better than those in larger classrooms, regardless of the presence of an aide. This agrees with the report included with the Harvard dataset.  
+
+# Checking for Nonlinearity in Score Target Variable
+
+We see that upon applying the Box-Cox procedure, we recognize a serious nonlinearity with our data. Specifically, the value of 1 deviates heavily from the optimal 95% confidence interval obtain from the procedure. Observe, the "optimal" value of $\lambda$ is printed below: 
+
+```{r, echo=FALSE}
+X_1 <- students_cleaned$g1schid
+X_2 <- students_cleaned$g1classtype
+Y <- students_cleaned$median_score
+bc <- boxcox(Y ~ X_1 + X_2)
+lambda <- bc$x[which.max(bc$y)]
+print(lambda)
+```
+
+Recall, the box cox procedure tells us an appropriate transformation for the response variable $Y$. Specifically, 
+
+$$Y_{\text{transformed}} = \begin{cases}
+\frac{1}{\lambda} (Y^{\lambda} - 1) & \lambda \not = 0 \\
+\log(Y) & \text{otherwise}
+\end{cases}$$
+
+Notice, we simply choose $\lambda = 0$ since that is reasonably close to the 95% confidence interval within the box-cox plot. 
+
+```{r transform_Y, echo=FALSE}
+
+lambda <- 0
+
+#Y_transform <- 1/lambda * (Y^lambda - 1)
+
+transform <- function(z) {
+  #return(1/lambda * (z^lambda - 1))
+  return(log(z))
+}
+
+inverse_transform <- function(z) {
+  #return((lambda*z / 1 + 1)^(1/lambda))
+  return(exp(z))
+}
+```
+
+# Inferential analysis 
+
+We want to model this multivariate relationship between first grade math scores with the particular school and class room type in which each student was instructed. Specifically, we wish to employ the model 
+$$Y_{ij, \text{transformed}} = \mu + \alpha_{i} + \beta_{j} + \epsilon_{ij}$$
+
+where the index $i$ represents the class type: small ($i=1$), regular ($i=2$), regular with aide ($i=3$), and the index $j$ represents the school indicator. For this model, we make the following assumptions: 
+
+* Each cell $(i,j)$ is normally distributed with the same variance $\sigma^2$, and we use the error term $\epsilon_{i,j} \sim N(0, \sigma^2)$
+* The natural constraints on $\alpha_i$ and $\beta_j$ are 
+$$\sum_{i = 1}^3 n_i \alpha_i = 0 \ \ \ \text{ and } \ \ \ \sum_{j = 1}^{77} n_j \beta_j = 0$$
+* Assuming no interaction term implies for all $i,j$, 
+$$(\alpha \beta)_{i,j} = 0$$
+
+Upon fitting the model, we get the following ANOVA table. Specifically, we notice the F-statistic on the additive terms are clearly signficant, with p-values on the order of $10^{-30}$.
+
+```{r, echo=FALSE}
+model1 = aov(transform(median_score) ~ g1classtype + g1schid, data = students_cleaned)
+summary(model1)
+#Anova(model1, type = "III")
+```
+
+This suggests that schools will have an impact on the mean score, not just the class room type. We can see certain schools have a greater impact than others, indicated by the magnitude of their coefficients: 
+
+```{r, echo=FALSE}
+print(model1$coef)
+
+```
+
+Suppose that class size has no effect on wage. Then it would follow that the effect terms would be zero. Therefore, we formulate the null and alternative hypotheses to be:
+$$H_0: \alpha_1= \alpha_2= \alpha_3 = 0$$
+$$H_A: \text{ not all } \alpha_i \text{ are zero } $$
+the ANOVA table tells us the F-statistic in this case is: 
+
+$$F:= 17.528$$
+
+which has a p-value of $1.4 \cdot 10^{-30}$, so we can assume that these coefficients are indeed significant. 
+
+Similarly, suppose that class size has no effect on wage. Then it would follow that the effect terms would be zero. Therefore, we formulate the null and alternative hypotheses to be:
+$$H_0: \beta_1= \beta_2= \ldots = \beta_{76} = 0$$
+$$H_A: \text{ not all } \beta_j \text{ are zero } $$
+the ANOVA table tells us the F-statistic in this case is: 
+
+$$F:= 6.549$$
+
+which has a p-value of $0$, so we can assume that these coefficients are indeed significant as well. 
+
+
+Now,  we can further press on by performing simultaneous inferencing to test whether schools themselves have a significant impact on the math score, beyond the control of the classroom setting. Using Tukey's Range Test, which compares pairwise over all 77 schools, we see that there are some schools for which their p-values are significant. (There are too many combinations to enumerate here) 
+
+```{r, echo=FALSE}
+my_tukey <- TukeyHSD(model1)
+par(mfrow = c(1,2))
+plot(my_tukey)
+```
+
+This indicates that we cannot assume that schools don't play a significant impact on a students performance. 
+
+# Sensitivity analysis 
+
+
+## Testing for Normality
+
+We examine the residual plot of the fitted model.  Observe the Q-Q plot appears to be incredibly normal. 
+```{r, echo=FALSE}
+model2 = aov(median_score ~ g1classtype + g1schid, data = students_cleaned)
+plot(model1, 2)
+```
+
+
+We consult both the Anderson-Darling and Shapiro-Wilk normality tests. Observe, we see that we have no scepticism about any departure from normality:
+
+```{r, echo=FALSE}
+aov_residuals <- residuals(object = model1)
+ad.test(aov_residuals)
+shapiro.test(aov_residuals)
+```
+
+
+
+
+## Avoiding Use of Mean Statistic 
+
+An interesting question is "Why did we choose to use the median?" We recall that the mean is a non robust statistic against outliers. Observe, we can use the Anderson-Darling normality test to see that we should reject the normality assumption while using the mean, as seen below: 
+
+
+```{r, echo=FALSE}
+students_cleaned_2 <- students%>%dplyr::select(g1tmathss, g1classtype, g1schid, g1tchid)%>%mutate(na.count=rowSums(is.na(.))) 
+students_cleaned_2 <- students_cleaned_2%>%na.omit()%>%dplyr::select(-na.count) # drop rows with missing data
+
+students_cleaned_2 <- students_cleaned_2 %>% group_by(g1classtype, g1schid, g1tchid) %>% 
+  summarise(mean_score=mean(g1tmathss),
+            .groups = 'drop')
+
+students_cleaned_2$g1classtype=as.factor(students_cleaned_2$g1classtype)
+students_cleaned_2$g1schid=as.factor(students_cleaned_2$g1schid)
+
+model2 = aov(mean_score ~ g1classtype + g1schid, data = students_cleaned_2)
+
+
+aov_residuals <- residuals(object = model2)
+ad.test(aov_residuals)
+shapiro.test(aov_residuals)
+
+```
+
+We see that with a critical value of $\alpha = 10^{-3},$ the Anderson-Darling and Shapiro-Wilks tests both suggest to reject the Normality Assumption. This is why I have chosen to model using the median statistic. 
+
+## Testing for Equal Variances across Cells
+
+Looking at the Residuals verus fitted plot, we don't see any terrific deviations in our fit line:
+
+```{r, echo=FALSE}
+plot(model1, 1)
+```
+
+
+```{r, echo=FALSE}
+print(leveneTest(median_score ~ g1classtype*g1schid, data=students_cleaned))
+
+fligner.test(median_score ~ interaction(g1classtype, g1schid), data = students_cleaned)
+```
+
+
+We see that the p-value for Levene’s tests is less than the significance level of 0.001. However, its not the case for the Fligner-Killeen test. This inspires some doubt as to the treatment of data collection for these different groups of teachers. It could be some teachers may be more forthcoming with score information than others. However, we know these test tend to be conservative, and looking the our residuals fit line appears to be mostly straight. So we can assume our data is trustworthy and we're not experiencing too much unequal variances. 
+
+
+# Discussion 
+
+After using analysis of variation to identify whether there is a tangible connection between classroom size and test performance, we come to the conclusion that such a relationship is significant. Further, we can confidently state as a result of Kuskal's test that the mean of small classroom settings is significantly higher than those of larger settings, regardless of the presence of an aide. However, we also see that this trend is not independent of the specific school of attendance. So classroom setting will not guarantee performance unfortunately. But there are a variety of reasons for this. Certain schools may attract better trained professionals than others, or have the resources to provide smaller classrooms settings. This inability to have smaller classrooms would explain why there may lack equal variance across schools.  
+
+For future studies, it may be useful to consider, as opposed to singular testing events, the series of tests students take over their academic careers. It might also be usefult to use more of the available features to study test performance. 
+
+
+# Acknowledgement {-}
+
+The instructors and TAs have been very helpful, making themselves available and approachable to ask questions. I'm very thankful at how attentive they are to student needs. 
+
+# Reference {-}
+
+Achilles, C.M. et al. (2008) Tennessee's student teacher achievement ratio (STAR) project, Harvard Dataverse. Harvard Dataverse. Available at: https://dataverse.harvard.edu/dataset.xhtml?persistentId=hdl%3A1902.1%2F10766 (Accessed: February 16, 2023). 
+
+Imbens, G., & Rubin, D. (2015). Stratified Randomized Experiments. In Causal Inference for Statistics, Social, and Biomedical Sciences: An Introduction (pp. 187-218). Cambridge: Cambridge University Press. doi:10.1017/CBO9781139025751.010
+
+# Session info {-}
+
+<span style='color:blue'>
+Report information of your `R` session for reproducibility. 
+</span> 
+
+
+```{r}
+sessionInfo()
+```
+
+# Appendix
+
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+
+```
