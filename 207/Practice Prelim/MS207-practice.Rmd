@@ -1,7 +1,9 @@
 ---
 title: "MS Comprehensive Exam 2022"
 date: "STA 207  (100 points)"
-output: html_document
+output:
+    pdf_document:
+        latex_engine: xelatex
 ---
 
 <span style="color:red">**Read the instructions on Canvas carefully!**</span>

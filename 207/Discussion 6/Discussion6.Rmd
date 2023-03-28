@@ -2,8 +2,9 @@
 title: "Discussion6"
 author: "Jing Lyu"
 date: "2/15/2023"
-output: html_document
-bibliography: references.bib 
+output:
+    pdf_document:
+        latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}
@@ -165,7 +166,7 @@ For this section, we use `Wage` dataset. We are interested in investigating the 
 It is an unbalanced design.
 
 ```{r wage}
-wage = read.csv('/Users/jinglyu/Desktop/ucd/2023W/STA207/CourseMaterials/Discussion/Discussion6/Wage.csv')
+wage = read.csv('Wage.csv')
 wage$ethnicity = as.factor(wage$ethnicity)
 wage$occupation = as.factor(wage$occupation)
 table(wage$ethnicity, wage$occupation)

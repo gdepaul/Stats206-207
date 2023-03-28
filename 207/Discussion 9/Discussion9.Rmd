@@ -2,7 +2,9 @@
 title: "Discussion9"
 author: "Jing Lyu"
 date: "3/8/2023"
-output: html_document
+output:
+    pdf_document:
+        latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}
@@ -167,4 +169,4 @@ Low sensitivity can result in false negatives, incorrectly identifying low birth
 
 Sensitivity and specificity are inversely related.
 
-![](/Users/jinglyu/Desktop/ucd/2023W/STA207/CourseMaterials/Discussion/Discussion9/table1.jpg)
+![](table1.png)

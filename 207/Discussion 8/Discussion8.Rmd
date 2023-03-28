@@ -2,7 +2,9 @@
 title: "Discussion8"
 author: "Jing Lyu"
 date: "3/1/2023"
-output: html_document
+output:
+    pdf_document:
+        latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}
@@ -37,7 +39,8 @@ $\mathbb{E}[{\rm MSAB}]- \mathbb{E}[{\rm MSE}]=n\sigma^2_{\alpha\beta}, \mathbb{
 
 Test statistics:
 
-![](/Users/jinglyu/Desktop/ucd/2023W/STA207/CourseMaterials/Discussion/Discussion8/table1.jpg)
+![](table1.png)
+
 For this section, we consider a dataset from online resources. Five employees are randomly selected from a company. Six batches of source material are randomly selected from the production process. The material from each batch was divided into 15 pieces. They were randomized to the different employees such that each employee would have three test specimens from each batch. The response was the corresponding quality score. 
 
 ```{r batch}
@@ -101,7 +104,7 @@ $\mathbb{E}[{\rm MSAB}]- \mathbb{E}[{\rm MSE}]=n\sigma^2_{\alpha\beta}, \mathbb{
 
 Test statistics:
 
-![](/Users/jinglyu/Desktop/ucd/2023W/STA207/CourseMaterials/Discussion/Discussion8/table2.jpg)
+![](table2.png)
 
 For this section, we use `Machines` dataset from `nlme` package. It contains experiment results of three brands of machines. Six workers were randomly chosen among the employees of a factory to operate each machine three times. Productivity score is considered as the response variable.
 

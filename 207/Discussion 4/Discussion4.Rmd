@@ -2,7 +2,9 @@
 title: "Discussion4"
 author: "Jing Lyu"
 date: "02/01/2023"
-output: html_document
+output:
+    pdf_document:
+        latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}

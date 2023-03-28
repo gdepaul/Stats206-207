@@ -2,7 +2,9 @@
 title: "Discussion5"
 author: "Jing Lyu"
 date: "2/8/2023"
-output: html_document
+output:
+    pdf_document:
+        latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}
@@ -61,7 +63,7 @@ summary(model2)
 #install.packages("haven")
 #install.packages("tzdb")
 library(haven) # readin sav file
-star = read_sav("/Users/jinglyu/Desktop/ucd/2023W/STA207/CourseMaterials/Projects/STAR_Students.sav")%>%as.data.frame()
+star = read_sav("STAR_Students.sav")%>%as.data.frame()
 length(names(star)) # 379 variables
 # check missing values
 star.dat = star%>%dplyr::select(g1tmathss, g1classtype, g1schid, g1tchid)%>%mutate(na.count=rowSums(is.na(.))) 
