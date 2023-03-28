@@ -3,9 +3,8 @@ title: "Validating the impact of Class Size on Test Performance "
 author: "Greg DePaul"
 date: "17 February 2023"
 output:
-  html_document:
-    df_print: paged
-    number_sections: yes
+    pdf_document:
+        latex_engine: xelatex
 ---
 ```{r global_options, include=FALSE}
 library('AER')

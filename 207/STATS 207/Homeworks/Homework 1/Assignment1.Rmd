@@ -1,7 +1,9 @@
 ---
 title: "STA 207: Assignment I"
 author: "Greg DePaul (917835494)"
-output: html_document
+output:
+    pdf_document:
+        latex_engine: xelatex
 ---
 ***
 
