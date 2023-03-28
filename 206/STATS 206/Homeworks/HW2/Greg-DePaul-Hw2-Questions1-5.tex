@@ -1,0 +1,301 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not alter this block (unless you're familiar with LaTeX
+\documentclass{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amssymb,amsfonts, fancyhdr, color, comment, graphicx, environ}
+\usepackage{mathrsfs}
+
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage[shortlabels]{enumitem}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+
+
+\pagestyle{fancy}
+
+\newcommand{\aboverightarrow}[1]{\xrightarrow[]{#1}}
+
+\newenvironment{problem}[2][Problem]
+    { \begin{mdframed}[backgroundcolor=gray!20] \textbf{#1 #2} \\}
+    {  \end{mdframed}}
+
+% Define solution environment
+\newenvironment{solution}
+    {\textit{Solution:}}
+    {}
+    \newcommand{\indep}{\perp \!\!\! \perp}
+    \renewcommand\qedsymbol{$\blacksquare$}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\seminorm}[1]{\left [#1\right]}
+\newcommand{\ts}{\textsuperscript}
+\usepackage{scalerel}[2014/03/10]
+\usepackage[usestackEOL]{stackengine}
+\def\avint{\,\ThisStyle{\ensurestackMath{%
+  \stackinset{c}{.2\LMpt}{c}{.5\LMpt}{\SavedStyle-}{\SavedStyle\phantom{\int}}}%
+  \setbox0=\hbox{$\SavedStyle\int\,$}\kern-\wd0}\int}
+\def\ddashint{\,\ThisStyle{\ensurestackMath{%
+  \stackinset{c}{.2\LMpt}{c}{.5\LMpt+.2\LMex}{\SavedStyle-}{%
+    \stackinset{c}{.2\LMpt}{c}{.5\LMpt-.2\LMex}{\SavedStyle-}{%
+      \SavedStyle\phantom{\int}}}}\setbox0=\hbox{$\SavedStyle\int\,$}\kern-\wd0}\int}
+
+\newcommand{\skipline}{$ \ $}
+
+\newcommand{\reals}{\mathbb R}
+\newcommand{\ints}{\mathbb Z}
+\newcommand{\normal}{\trianglelefteq}
+\newcommand{\onormal}{\trianglerighteq}
+
+\newcommand{\subgroup}{\leqslant}
+
+\newcommand{\sigalg}{\mathscr A}
+\newcommand{\setsequence}{ \{ E_n \}_{n=1}^{\infty} }
+\newcommand{\unionsetsequence}{ \bigcup_{i=1}^{\infty}  A_i }
+\newcommand{\intersectionsetsequence}{ \bigcap_{i=1}^{\infty}  A_i }
+\newcommand{\measureablespace}{(X, \sigalg)}
+\newcommand{\measurespace}{(X, \sigalg, \mu)}
+\newcommand{\borelspace}{\mathscr{B}(X)}
+\newcommand{\lebesguemeasurespace}{(X, \borelspace, \lambda)}
+\newcommand{\schwartzspace}{\mathcal S(\mathbb R^n)}
+\newcommand{\temperedspace}{\mathcal S'(\mathbb R^n)}
+
+\newcommand{\measure}{\mu: \sigalg \rightarrow [0, + \infty]} 
+\newcommand{\outermeasure}{\mu: \mathbb{P}(X) \rightarrow [0, + \infty]} 
+\newcommand{\convergesinmeasure}{\xrightarrow[\mu]{}} 
+\newcommand{\convergesinLp}{\xrightarrow[L^p]{}} 
+
+\newcommand{\convergesinschwartz}{\xrightarrow[]{\mathcal S}} 
+
+\renewcommand{\qed}{\quad\qedsymbol}
+\setlength\parindent{0pt}
+
+% prevent line break in inline mode
+\binoppenalty=\maxdimen
+\relpenalty=\maxdimen
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fill in the appropriate information below
+\lhead{Greg DePaul}
+\rhead{Stats 206} 
+\chead{\textbf{Homework 2  Due: 13 October 2022}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{problem}{1}
+Tell true or false of the following statements and provide a brief explanation to your answer.
+\begin{enumerate}[(a)]
+\item Under the same confidence level, the prediction interval of a new observation is always wider than the confidence interval for the corresponding mean response.
+\item When estimating the mean response corresponding to $X_h$, the further $X_h$ is from the sample mean $\overline X$, the wider the confidence interval for the mean response tends to be.
+\item If all observations $(X_i, Y_i)$ fall on one straight line (non-vertical), then the coefficient of determination $R^2 = 1$.
+\item A large $R^2$ means that the fitted regression line is a good fit of the data, while a small $R^2$ means that the predictor and the response are not related.
+\item The regression sum of squares $SSR$ tends to be large if the estimated regression slope is large in magnitude or the dispersion of the predictor values is large.
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item True. This is because 
+$$\sigma^2(pred_h) = \sigma^2 \left (1 + \frac{1}{n} + \frac{(X_h - \overline{X})^2}{\sum_{i = 1}^n (X_i - \overline{X})^2} \right ) > \sigma^2 \left (\frac{1}{n} + \frac{(X_h - \overline{X})^2}{\sum_{i = 1}^n (X_i - \overline{X})^2} \right ) = \sigma^2(\hat Y_h)$$
+\item True. Observe, 
+$$Var(\hat Y_h) = \sigma^2 \left (\frac{1}{n} + \frac{(X_h - \overline{X})^2}{\sum_{i = 1}^n (X_i - \overline{X})^2} \right ) \geq \frac{\sigma^2}{n} = Var(\hat Y_{\overline{X}}) $$
+\item True. Because $SSR / SSTO = 1 \implies Y_i = \hat Y_i = \hat \beta_0 + \hat \beta_1 X_i$ for all $i$. 
+\item False. Pearson correlation fails to account for nonlinear relationships in data. 
+\item True. This is because SSR is directly related to slope and dispersion by the formula: 
+$$SSR = \underbrace{\hat \beta_1^2}_{slope} \underbrace{\sum_{i = 1}^n 
+(X_i - \overline X)^2}_{dispersion}$$
+\end{enumerate}
+\end{solution}
+
+\begin{problem}{2}
+Under the simple linear regression model:
+\begin{enumerate}[(a)]
+\item Derive $E(\hat \beta_1^2)$.
+\item Show that the regression sum of squares
+$$SSR = \hat \beta_1^2 \sum_{i = 1}^n (X_i - \overline X)^2$$
+\item Derive $E(SSR)$.
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item We remember the formula for variance as: 
+$$Var(Z) = E[Z^2] - E[Z]^2 \implies E[Z^2] = Var(Z) + E[Z]^2$$
+On the last homework assignment, we showed that 
+$$E[\hat \beta_1] = \beta_1$$
+To calculate the variance, we know that 
+\begin{align*}
+Var(\hat \beta_1) &= Var \left ( \frac{\sum_{i = 1}^n (X_i - \overline X) (Y_i - \overline{Y})}{\underbrace{\sum_{i = 1}^n (X_i - \overline X)^2}_{S_{XX}} } \right)  \\
+&= \sum_{i = 1}^n Var \left ( \frac{ (X_i - \overline X) (Y_i - \overline{Y})}{S_{XX}} \right)  \\
+&= \sum_{i = 1}^n \left ( \frac{ (X_i - \overline X) }{S_{XX}} \right)^2 Var(Y_i - \overline{Y}) \\
+&= \sum_{i = 1}^n \left ( \frac{ (X_i - \overline X) }{S_{XX}} \right)^2 \sigma^2 \\
+&= \frac{\sigma^2}{S_{XX}^2} \sum_{i = 1}^n (X_i - \overline X)^2 \\
+&= \frac{\sigma^2}{S_{XX}} \\
+&= \frac{\sigma^2}{\sum_{i = 1}^n (X_i - \overline X)^2}
+\end{align*}
+Therefore, we see that 
+$$E[\hat \beta_1^2] = \beta_1^2 + \frac{\sigma^2}{ \sum_{i = 1}^n (X_i - \overline X)^2}$$
+\item Using the alternative form of $\hat Y_i = \overline{Y} + \hat \beta_1(X_i - \overline X)$, we see that
+\begin{align*}
+SSR &= \sum_{i = 1}^n (\hat Y_i - \overline{Y})^2 \\
+&=  \sum_{i = 1}^n (\overline{Y} + \hat \beta_1 (X_i - \overline{X}) - \overline{Y})^2 \\
+&=  \sum_{i = 1}^n (\hat \beta_1 (X_i - \overline{X}))^2 \\
+&=  \sum_{i = 1}^n \hat \beta_1^2 (X_i - \overline{X})^2 \\
+&= \hat \beta_1^2 \sum_{i = 1}^n (X_i - \overline{X})^2
+\end{align*}
+
+\item Lastly, since each $X_i$ and $\overline{X}$ is assumed to be a fixed quantity, it follows that by linearity, 
+$$E[SSR] = E[\hat \beta_1^2 \sum_{i = 1}^n (X_i - \overline{X})^2] = E[\hat \beta_1^2]\left(\sum_{i = 1}^n (X_i - \overline{X})^2 \right) = \beta_1^2 \left (\sum_{i = 1}^n (X_i - \overline{X})^2\right) + \sigma^2$$
+\end{enumerate}
+\end{solution}
+
+\begin{problem}{3}
+Under the simple linear regression model, show that the residuals $e_i$'s are uncorrelated
+with the LS estimators $\beta_0$ and $\beta_1$, i.e.,
+$$Cov(e_i, \hat \beta_0) = 0, \ \ \ Cov(e_i, \hat \beta_1) = 0$$
+for $i = 1,\ldots , n$.
+\end{problem}
+\begin{solution}
+Recall that for each $i$, 
+$$e_i = Y_i - ( \hat \beta_0 + \hat \beta_1 X_i) = (\beta_0 - \hat \beta_0) + (\beta_1 - \hat \beta_1) X_i + \epsilon_i$$
+
+We know from the slides that in our simple linear regression model, we assume: 
+
+$$Cov(\epsilon_i, \epsilon_j) = \begin{cases}
+0 & i \not = j \\
+\sigma^2 & i = j
+\end{cases}$$
+
+$$\implies E[\epsilon_i \epsilon_j] = Cov(\epsilon_i, \epsilon_j) - E[\epsilon_i]E[\epsilon_j] = Cov(\epsilon_i, \epsilon_j)  $$
+
+\begin{align*}
+E[\epsilon_j \hat \beta_0] &= E \left [ \epsilon_j  \left (\frac{1}{n} \sum_{i = 1}^n Y_i -  \overline{X} \frac{\sum_{i = 1}^n (X_i - \overline{X}) (Y_i - \overline{Y})}{\sum_{i = 1}^n (X_i - \overline X)^2} \right) \right] \\
+&=   \frac{1}{n} \sum_{i = 1}^n E [ \epsilon_j (\beta_0 + \beta_1 X_i + \epsilon_i)] -  \overline{X} \frac{\sum_{i = 1}^n (X_i - \overline{X}) E[ \epsilon_j (Y_i - \overline{Y})]}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=   \frac{1}{n} \sum_{i = 1}^n E [  \epsilon_i \epsilon_j] -  \overline{X} \frac{\sum_{i = 1}^n (X_i - \overline{X}) E[ \epsilon_j (Y_i - \overline{Y})]}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=   \frac{1}{n} \sum_{i = 1}^n E [  \epsilon_i \epsilon_j] -  \overline{X} \frac{\sum_{i = 1}^n (X_i - \overline{X}) \left ( E[ \epsilon_j (\beta_0 + \beta_1 X_i + \epsilon_i)] - E[ \epsilon_j \overline{Y}] \right)}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=   \frac{1}{n} \sum_{i = 1}^n E [  \epsilon_i \epsilon_j] -  \overline{X} \frac{\sum_{i = 1}^n (X_i - \overline{X}) \left ( E[\epsilon_i \epsilon_j ] - E[ \epsilon_j \frac{1}{n} \sum_{k =  1}^n Y_i] \right)}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=   \frac{1}{n} \sum_{i = 1}^n E [  \epsilon_i \epsilon_j] -  \overline{X} \frac{\sum_{i = 1}^n (X_i - \overline{X}) \left ( E[\epsilon_i \epsilon_j ] - \frac{1}{n} \sum_{k =  1}^n E[\epsilon_j \epsilon_k ] \right)}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=   \frac{\sigma^2}{n}  -  \overline{X} \frac{\sum_{i = 1}^n (X_i - \overline{X}) \left ( E[\epsilon_i \epsilon_j ] - \frac{\sigma^2}{n}  \right)}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=   \frac{\sigma^2}{n}  -  \overline{X} \frac{\sum_{i = 1}^n (X_i - \overline{X}) ( E[\epsilon_i \epsilon_j ] ) -  \frac{\sigma^2}{n}  \sum_{i = 1}^n (X_i - \overline{X})}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=   \frac{\sigma^2}{n}  -  \overline{X} \frac{\sigma^2 (X_j - \overline{X})-  \frac{\sigma^2}{n}  \sum_{i = 1}^n (X_i - \overline{X})}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=   \frac{\sigma^2}{n}  -  \frac{\sigma^2 \overline{X} (X_j - \overline{X})}{\sum_{i = 1}^n (X_i - \overline X)^2} 
+\end{align*}
+
+Observe, 
+\begin{align*}
+Cov(e_i, \hat \beta_0) &= E[e_i \hat \beta_0] - E[e_i] E[\hat \beta_0]\\
+&= E[\left ((\beta_0 - \hat \beta_0) + (\beta_1 - \hat \beta_1) X_i + \epsilon_i \right) \hat \beta_0] - E[(\beta_0 - \hat \beta_0) + (\beta_1 - \hat \beta_1) X_i + \epsilon_i] E[\hat \beta_0] \\
+&= E[ (\beta_0 - \hat \beta_0) \hat \beta_0] + E[(\beta_1 - \hat \beta_1) \hat \beta_0 X_i + E[\epsilon_i  \hat \beta_0] - \left  ( E[(\beta_0 - \hat \beta_0)] + E[(\beta_1 - \hat \beta_1) X_i] + E[\epsilon_i] \right ) E[\hat \beta_0] \\
+&= E[ \beta_0\hat \beta_0] - E[ \hat \beta_0\hat \beta_0] + E[\beta_1\hat \beta_0 ] X_i - E[\hat \beta_0 \hat \beta_1]X_i + E[\epsilon_i  \hat \beta_0] - \left  ( E[(\beta_0 - \hat \beta_0)] + E[(\beta_1 - \hat \beta_1) X_i] + E[\epsilon_i] \right ) E[\hat \beta_0] \\
+&=\beta_0 E[ \hat \beta_0] - E[ \hat \beta_0^2] + \beta_1 X_i E[\hat \beta_0 ]  - E[\hat \beta_0 \hat \beta_1]X_i + E[\epsilon_i  \hat \beta_0] - \left  ( \beta_0 - E[\hat \beta_0] + \beta_1  X_i - E[\hat \beta_1]X_i + E[\epsilon_i] \right ) E[\hat \beta_0] \\
+&=\beta_0 E[ \hat \beta_0] - E[ \hat \beta_0^2] + \beta_1 X_i E[\hat \beta_0 ]  - E[\hat \beta_0 \hat \beta_1]X_i + E[\epsilon_i  \hat \beta_0] - \left  ( \beta_0 - \beta_0 + \beta_1  X_i - \beta_1X_i + 0 \right ) \beta_0 \\
+&=\beta_0 E[ \hat \beta_0] - E[ \hat \beta_0^2] + \beta_1 X_i E[\hat \beta_0 ]  - E[\hat \beta_0 \hat \beta_1]X_i + E[\epsilon_i  \hat \beta_0]\\
+&=\beta_0^2 - \sigma^2 
+\left ( \frac{1}{n}  + \frac{\overline X^2}{\sum_{i = 1}^n (X_i - \overline X)^2}\right) - \beta_0^2 + \beta_0 \beta_1 X_i   - \left ( \frac{- \sigma^2 \overline X}{ \sum_{i = 1}^n (X_i -\overline X)^2} + \beta_0 \beta_1 \right) X_i + E[\epsilon_i  \hat \beta_0] \\
+&= - \sigma^2  \left ( \frac{1}{n}  + \frac{\overline X^2}{\sum_{i = 1}^n (X_i - \overline X)^2}\right)  - \left ( \frac{- \sigma^2 \overline X}{ \sum_{i = 1}^n (X_i -\overline X)^2} \right) X_i + E[\epsilon_i  \hat \beta_0] \\
+&= 0
+\end{align*}
+
+Similarly, 
+
+\begin{align*}
+E[\epsilon_j \hat \beta_1] &= E \left [ \epsilon_j  \left ( \frac{\sum_{i = 1}^n (X_i - \overline{X}) (Y_i - \overline{Y})}{\sum_{i = 1}^n (X_i - \overline X)^2} \right) \right] \\
+&=   \frac{\sum_{i = 1}^n (X_i - \overline{X}) E[ \epsilon_j (Y_i - \overline{Y})]}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=   \frac{\sum_{i = 1}^n (X_i - \overline{X}) E[ \epsilon_j (Y_i - \overline{Y})]}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&= \frac{\sum_{i = 1}^n (X_i - \overline{X}) \left ( E[ \epsilon_j (\beta_0 + \beta_1 X_i + \epsilon_i)] - E[ \epsilon_j \overline{Y}] \right)}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&= \frac{\sum_{i = 1}^n (X_i - \overline{X}) \left ( E[\epsilon_i \epsilon_j ] - E[ \epsilon_j \frac{1}{n} \sum_{k =  1}^n Y_i] \right)}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&= \frac{\sum_{i = 1}^n (X_i - \overline{X}) \left ( E[\epsilon_i \epsilon_j ] - \frac{1}{n} \sum_{k =  1}^n E[\epsilon_j \epsilon_k ] \right)}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=  \frac{\sum_{i = 1}^n (X_i - \overline{X}) \left ( E[\epsilon_i \epsilon_j ] - \frac{\sigma^2}{n}  \right)}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=  \frac{\sum_{i = 1}^n (X_i - \overline{X}) ( E[\epsilon_i \epsilon_j ] ) -  \frac{\sigma^2}{n}  \sum_{i = 1}^n (X_i - \overline{X})}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=  \frac{\sigma^2 (X_j - \overline{X})-  \frac{\sigma^2}{n}  \sum_{i = 1}^n (X_i - \overline{X})}{\sum_{i = 1}^n (X_i - \overline X)^2} \\
+&=    \frac{\sigma^2(X_j - \overline{X})}{\sum_{i = 1}^n (X_i - \overline X)^2} 
+\end{align*}
+
+
+\begin{align*}
+Cov(e_i, \hat \beta_1) &= E[e_i \hat \beta_1] - E[e_i] E[\hat \beta_1]\\
+&= E[\left ((\beta_0 - \hat \beta_0) + (\beta_1 - \hat \beta_1) X_i + \epsilon_i \right) \hat \beta_1] - E[(\beta_0 - \hat \beta_0) + (\beta_1 - \hat \beta_1) X_i + \epsilon_i] E[\hat \beta_1] \\
+&= E[ (\beta_0 - \hat \beta_0) \hat \beta_1] + E[(\beta_1 - \hat \beta_1) \hat \beta_1 X_i + E[\epsilon_i  \hat \beta_1] - \left  ( E[(\beta_0 - \hat \beta_0)] + E[(\beta_1 - \hat \beta_1) X_i] + E[\epsilon_i] \right ) E[\hat \beta_1] \\
+&= E[ \beta_0\hat \beta_1] - E[ \hat \beta_0\hat \beta_1] + E[\beta_1\hat \beta_1 ] X_i - E[ \hat \beta_1^2]X_i + E[\epsilon_i  \hat \beta_1] - \left  ( E[(\beta_0 - \hat \beta_0)] + E[(\beta_1 - \hat \beta_1) X_i] + E[\epsilon_i] \right ) E[\hat \beta_1] \\
+&= \beta_0 E[\hat \beta_1] - E[ \hat \beta_0\hat \beta_1] + \beta_1 E[\hat \beta_1 ] X_i - E[ \hat \beta_1^2]X_i + E[\epsilon_i  \hat \beta_1]\\
+&= \beta_0 \beta_1 - \left (\frac{- \sigma^2 \overline X}{ \sum_{i = 1}^n (X_i -\overline X)^2} + \beta_0 \beta_1
+ \right)+ \beta_1^2 X_i - X_i \left (\beta_1^2 + \frac{\sigma^2}{ \sum_{i = 1}^n (X_i - \overline X)^2} \right ) + E[\epsilon_i  \hat \beta_1] \\
+ &=  \left (\frac{\sigma^2 \overline X}{ \sum_{i = 1}^n (X_i -\overline X)^2} 
+ \right) - X_i \left ( \frac{\sigma^2}{ \sum_{i = 1}^n (X_i - \overline X)^2} \right ) + E[\epsilon_i  \hat \beta_1] \\
+ &= 0
+\end{align*}
+\end{solution}
+
+\begin{problem}{4}
+Under the Normal error model: Show that $SSE$ is independent with the LS estimators
+$\hat \beta_0$ and $\hat \beta_1$. (Hint: Use the fact that, if two sets of random variables, say $(Z_1, \ldots, Z_s)$ and $(W_1,\ldots ,W_t)$, are independent with each other, then their functions, say $f(Z_1, \ldots, Z_s)$ and $g(W_1, \ldots , W_t)$, are independent.)
+\end{problem}
+\begin{solution}
+Observe, we can define the function 
+
+$$SSE = \sum_{i = 1}^n e_i^2 = f(e_1, \ldots, e_n)$$
+
+We also know that under the normal error model, 
+$$cov(e_i, \hat \beta_0 ) = 0 \implies e_i \indep \hat \beta_0 $$
+$$cov(e_i, \hat \beta_1 ) = 0 \implies e_i \indep \hat \beta_1 $$
+for all $1 \leq i\leq n$, which was proven in Problem 3. Therefore, if we let $g = id : \mathbb R \rightarrow \mathbb R$, then we see that by the fact mentioned in the prompt, 
+
+$$e_i \indep \hat \beta_0 \forall i \implies f(e_1, \ldots, e_n) \indep g(\beta_0) \implies SSE \indep \hat \beta_0$$
+$$e_i \indep \hat \beta_1 \forall i \implies f(e_1, \ldots, e_n) \indep g(\beta_1) \implies SSE \indep \hat \beta_1$$
+\end{solution}
+
+\begin{problem}{5}
+Under the simple linear regression model, derive $Var(\hat Y_h)$, where
+$$\hat Y_h = \hat \beta_0 + \hat \beta_1 X_h$$
+is the estimator of the mean response $\beta_0 + \beta_1 X_h$.
+\end{problem}
+\begin{solution}
+We need some necessary quantities: 
+
+$$E[\hat \beta_0^2 ] = Var(\hat \beta_0^2) + E[\hat \beta_0]^2 = \sigma^2 
+\left ( \frac{1}{n}  + \frac{\overline X^2}{\sum_{i = 1}^n (X_i - \overline X)^2}\right) + \beta_0^2$$
+
+and
+
+\begin{align*}
+E[\hat \beta_0 \hat \beta_1] &= Cov(\hat \beta_0, \hat \beta_1) + E[\hat \beta_0] E[\hat \beta_1] \\
+&= \frac{- \sigma^2 \overline X}{ \sum_{i = 1}^n (X_i -\overline X)^2} + \beta_0 \beta_1
+\end{align*}
+
+Now, observe, 
+\begin{align*}
+Var(\hat Y_h) &= Var(\hat \beta_0 + \hat \beta_1 X_h) \\
+&= E[(\hat \beta_0 + \hat \beta_1 X_h)^2] - E[\hat \beta_0 + \hat \beta_1 X_h]^2 \\
+&= E[\hat \beta_0^2 + 2 \hat \beta_0 \hat \beta_1 X_h + \hat \beta_1^2 X_h^2] - E[\hat \beta_0 + \hat \beta_1 X_h]^2 \\
+&= E[\hat \beta_0^2] + 2 X_h E[\hat \beta_0 \hat \beta_1]  + X_h^2 E[ \hat \beta_1^2] - \left ( E[\hat \beta_0] + X_h E[\hat \beta_1 ] \right) ^2 \\
+&= E[\hat \beta_0^2] + 2 X_h E[\hat \beta_0 \hat \beta_1]  + X_h^2 E[ \hat \beta_1^2] - \left ( E[\hat \beta_0]^2 + 2 X_h E[\hat \beta_0] E[\hat \beta_1 ]  + X_h^2 E[\hat \beta_1 ]^2 \right)  \\
+&= \sigma^2 
+\left ( \frac{1}{n}  + \frac{\overline X^2}{\sum_{i = 1}^n (X_i - \overline X)^2}\right) + \beta_0^2 + 2 X_h E[\hat \beta_0 \hat \beta_1]  + X_h^2 \beta_1^2 + X_h^2 \frac{\sigma^2}{ \sum_{i = 1}^n (X_i - \overline X)^2} \\
+&- \left (\beta_0^2  + 2 X_h \beta_0  \beta_1  + X_h^2 \beta_1^2 \right)  \\
+&= \sigma^2 
+\left ( \frac{1}{n}  + \frac{\overline X^2}{\sum_{i = 1}^n (X_i - \overline X)^2}\right) + 2 X_h E[\hat \beta_0 \hat \beta_1]  + X_h^2 \frac{\sigma^2}{ \sum_{i = 1}^n (X_i - \overline X)^2} - 2 X_h \beta_0  \beta_1  \\
+&= \sigma^2 
+\left ( \frac{1}{n}  + \frac{\overline X^2}{\sum_{i = 1}^n (X_i - \overline X)^2}\right) + 2 X_h\left ( \frac{-\sigma^2 \overline{X}}{\sum_{i = 1}^n (X_i - \overline X)^2}  + \beta_0 \beta_1 \right)  + X_h^2 \frac{\sigma^2}{ \sum_{i = 1}^n (X_i - \overline X)^2} - 2 X_h \beta_0  \beta_1  \\
+&= \sigma^2 
+\left ( \frac{1}{n}  + \frac{\overline X^2}{\sum_{i = 1}^n (X_i - \overline X)^2}\right) + 2 X_h\left ( \frac{-\sigma^2 \overline{X}}{\sum_{i = 1}^n (X_i - \overline X)^2}  \right)  + X_h^2 \frac{\sigma^2}{ \sum_{i = 1}^n (X_i - \overline X)^2}  \\
+&= \sigma^2 
+\left ( \frac{1}{n}  + \frac{\overline X^2 - 2 X_h \overline{X} + X_h^2}{\sum_{i = 1}^n (X_i - \overline X)^2}\right) \\
+&= \sigma^2 \left ( \frac{1}{n} + \frac{(X_h - \overline{X})^2}{\sum_{i = 1}^n (X_i - \overline{X})^2} \right)
+\end{align*}
+
+\end{solution}
+
+\begin{problem}{6}
+Submitted as a  Markdown file. 
+\end{problem}
+
+\begin{problem}{7}
+Submitted as a  Markdown file. 
+\end{problem}
+
+
+\end{document}

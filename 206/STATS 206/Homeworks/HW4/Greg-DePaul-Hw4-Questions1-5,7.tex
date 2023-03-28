@@ -1,0 +1,368 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not alter this block (unless you're familiar with LaTeX
+\documentclass{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amssymb,amsfonts, fancyhdr, color, comment, graphicx, environ}
+\usepackage{mathrsfs}
+
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage[shortlabels]{enumitem}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+
+
+\pagestyle{fancy}
+\usepackage{float}
+\newcommand{\aboverightarrow}[1]{\xrightarrow[]{#1}}
+
+\newenvironment{problem}[2][Problem]
+    { \begin{mdframed}[backgroundcolor=gray!20] \textbf{#1 #2} \\}
+    {  \end{mdframed}}
+
+% Define solution environment
+\newenvironment{solution}
+    {\textit{Solution:}}
+    {}
+    \newcommand{\indep}{\perp \!\!\! \perp}
+    \renewcommand\qedsymbol{$\blacksquare$}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\seminorm}[1]{\left [#1\right]}
+\newcommand{\ts}{\textsuperscript}
+\usepackage{scalerel}[2014/03/10]
+\usepackage[usestackEOL]{stackengine}
+\def\avint{\,\ThisStyle{\ensurestackMath{%
+  \stackinset{c}{.2\LMpt}{c}{.5\LMpt}{\SavedStyle-}{\SavedStyle\phantom{\int}}}%
+  \setbox0=\hbox{$\SavedStyle\int\,$}\kern-\wd0}\int}
+\def\ddashint{\,\ThisStyle{\ensurestackMath{%
+  \stackinset{c}{.2\LMpt}{c}{.5\LMpt+.2\LMex}{\SavedStyle-}{%
+    \stackinset{c}{.2\LMpt}{c}{.5\LMpt-.2\LMex}{\SavedStyle-}{%
+      \SavedStyle\phantom{\int}}}}\setbox0=\hbox{$\SavedStyle\int\,$}\kern-\wd0}\int}
+
+\newcommand{\skipline}{$ \ $}
+
+\newcommand{\reals}{\mathbb R}
+\newcommand{\ints}{\mathbb Z}
+\newcommand{\normal}{\trianglelefteq}
+\newcommand{\onormal}{\trianglerighteq}
+
+\newcommand{\subgroup}{\leqslant}
+
+\newcommand{\sigalg}{\mathscr A}
+\newcommand{\setsequence}{ \{ E_n \}_{n=1}^{\infty} }
+\newcommand{\unionsetsequence}{ \bigcup_{i=1}^{\infty}  A_i }
+\newcommand{\intersectionsetsequence}{ \bigcap_{i=1}^{\infty}  A_i }
+\newcommand{\measureablespace}{(X, \sigalg)}
+\newcommand{\measurespace}{(X, \sigalg, \mu)}
+\newcommand{\borelspace}{\mathscr{B}(X)}
+\newcommand{\lebesguemeasurespace}{(X, \borelspace, \lambda)}
+\newcommand{\schwartzspace}{\mathcal S(\mathbb R^n)}
+\newcommand{\temperedspace}{\mathcal S'(\mathbb R^n)}
+
+\newcommand{\measure}{\mu: \sigalg \rightarrow [0, + \infty]} 
+\newcommand{\outermeasure}{\mu: \mathbb{P}(X) \rightarrow [0, + \infty]} 
+\newcommand{\convergesinmeasure}{\xrightarrow[\mu]{}} 
+\newcommand{\convergesinLp}{\xrightarrow[L^p]{}} 
+
+\newcommand{\convergesinschwartz}{\xrightarrow[]{\mathcal S}} 
+
+\renewcommand{\qed}{\quad\qedsymbol}
+\setlength\parindent{0pt}
+
+% prevent line break in inline mode
+\binoppenalty=\maxdimen
+\relpenalty=\maxdimen
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fill in the appropriate information below
+\lhead{Greg DePaul}
+\rhead{Stats 206} 
+\chead{\textbf{Homework 4  Due: 27 October 2022}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{problem}{1}
+Derive E(SSTO) and E(SSR) under the simple regression model using matrix algebra.
+\end{problem}
+\begin{solution}
+\begin{itemize}
+\item $SSTO = Y' \left [1 - \frac{1}{n}J \right ] Y$. Define 
+$$E[Y] = X \beta  \ \ \ \text{ and } \ \ \ Cov(Y) = \Sigma = \sigma^2 I$$
+Then we see that: 
+\begin{align*}
+E[SSTO] &= E \left [Y' \left [I - \frac{1}{n}J \right ] Y \right ] \\
+& = tr(\left [I - \frac{1}{n}J \right ]  \Sigma) + \beta' X' \left [I - \frac{1}{n}J \right ]  X \beta \\
+&= \sigma^2 tr(\left [I - \frac{1}{n}J \right ] ) + \beta' X' \left [I - \frac{1}{n}J \right ]  X \beta \\
+&= (n - 1) \sigma^2 +  \beta' X' \left [I - \frac{1}{n}J \right ]  X \beta \\
+&= (n - 1) \sigma^2 +  tr \left ( \left [I - \frac{1}{n}J \right ]  X \beta \beta' X' \right)  \\
+&= (n-1) \sigma^2 + tr(X\beta \beta' X') - \frac{1}{n} tr(J X\beta\beta' X')
+%&= (n - 1) \sigma^2 +  \begin{pmatrix}
+%\beta_0 & \beta_1
+%\end{pmatrix}  \begin{pmatrix}
+%1 & \ldots & 1 \\
+%x_1 & \ldots & x_n
+%\end{pmatrix}\begin{pmatrix}
+%\frac{n - 1}{n} & \frac{-1}{n} & \ldots & \frac{-1}{n}  \\
+%\frac{-1}{n} & \frac{n - 1}{n} & \ldots & \frac{-1}{n}  \\
+%\vdots & \vdots & \ddots & \vdots \\
+%\frac{-1}{n} & \frac{-1}{n} & \ldots & \frac{n-1}{n}  \\
+%\end{pmatrix} \begin{pmatrix}
+%1 & x_1 \\
+%\vdots & \vdots \\
+%1 & x_n
+%\end{pmatrix} \begin{pmatrix}
+%\beta_0 \\
+%\beta_1
+%\end{pmatrix} \\
+%&= (n - 1) \sigma^2 +  \begin{pmatrix}
+%\beta_0 & \beta_1
+%\end{pmatrix}  \begin{pmatrix}
+%1 & \ldots & 1 \\
+%x_1 & \ldots & x_n
+%\end{pmatrix}\begin{pmatrix}
+%\frac{2(n - 1)}{n} & \frac{n - 1}{n} x_1 - \frac{1}{n}(x_2 + \ldots + x_n)\\
+%\frac{2(n - 1)}{n} & \frac{n - 1}{n} x_2 - \frac{1}{n}(x_1 + x_3 + \ldots + x_n)\\
+%\vdots & \\
+%\frac{2(n - 1)}{n} & \frac{n - 1}{n} x_n - \frac{1}{n}(x_1 + x_2 + \ldots + x_{n - 1})\\
+%\end{pmatrix} \begin{pmatrix}
+%\beta_0 \\
+%\beta_1
+%\end{pmatrix} \\
+%&= (n - 1) \sigma^2 +  \begin{pmatrix}
+%\beta_0 & \beta_1
+%\end{pmatrix}  \begin{pmatrix}
+%2(n-1) & \frac{2(n - 1)}{n}(x_1 + \ldots + x_n) \\
+% \frac{2(n - 1)}{n}(x_1 + \ldots + x_n) & \sum_{i = 1}^n \sum_{j = 1} x_i x_j 
+%\end{pmatrix} \begin{pmatrix}
+%\beta_0 \\
+%\beta_1
+%\end{pmatrix} \\
+\end{align*}
+
+Then we see that: 
+
+\begin{align*}
+X \beta \beta' X' &= \begin{pmatrix}
+1 & x_1 \\
+\vdots & \vdots \\
+1 & x_n
+\end{pmatrix} \begin{pmatrix}
+\beta_0 \\
+\beta_1
+\end{pmatrix}\begin{pmatrix}
+\beta_0 & \beta_1
+\end{pmatrix}  \begin{pmatrix}
+1 & \ldots & 1 \\
+x_1 & \ldots & x_n
+\end{pmatrix} \\
+&= \begin{pmatrix}
+1 & x_1 \\
+\vdots & \vdots \\
+1 & x_n
+\end{pmatrix} \begin{pmatrix}
+\beta_0^2 & \beta_0 \beta_1 \\
+\beta_0 \beta_1 & \beta_1^2
+\end{pmatrix}  \begin{pmatrix}
+1 & \ldots & 1 \\
+x_1 & \ldots & x_n 
+\end{pmatrix} \\
+&= \begin{pmatrix}
+1 & x_1 \\
+\vdots & \vdots \\
+1 & x_n
+\end{pmatrix} \begin{pmatrix}
+\beta_0^2 + \beta_0 \beta_1 x_1 & \beta_0^2 + \beta_0 \beta_1 x_2 & \ldots & \beta_0^2 + \beta_0 \beta_1 x_n \\
+\beta_0 \beta_1 + \beta_1^2 x_1 & \beta_0 \beta_1 + \beta_1^2 x_2 & \ldots & \beta_0 \beta_1 + \beta_1^2 x_n 
+\end{pmatrix} 
+\end{align*} 
+$$\implies tr(X \beta \beta' X') = n \beta_0^2 + 2 \beta_0 \beta_1 \sum_{i = 1}^n x_i + \beta_1^2 \sum_{i = 1}^n x_i^2$$
+
+
+\begin{align*}
+J X \beta \beta' X' &= \begin{pmatrix}
+1 & 1 & \ldots & 1 \\
+1 & 1 & \ldots & 1 \\
+\vdots & \vdots & \ddots & \vdots \\
+1 & 1 & \ldots & 1 \\
+\end{pmatrix}
+\begin{pmatrix}
+1 & x_1 \\
+\vdots & \vdots \\
+1 & x_n
+\end{pmatrix} \begin{pmatrix}
+\beta_0^2 + \beta_0 \beta_1 x_1 & \beta_0^2 + \beta_0 \beta_1 x_2 & \ldots & \beta_0^2 + \beta_0 \beta_1 x_n \\
+\beta_0 \beta_1 + \beta_1^2 x_1 & \beta_0 \beta_1 + \beta_1^2 x_2 & \ldots & \beta_0 \beta_1 + \beta_1^2 x_n 
+\end{pmatrix} \\
+&= \begin{pmatrix}
+n & \sum_{i = 1}^n x_i \\
+n &  \sum_{i = 1}^n x_i \\
+\vdots & \vdots \\
+n &  \sum_{i = 1}^n x_i
+\end{pmatrix} \begin{pmatrix}
+\beta_0^2 + \beta_0 \beta_1 x_1 & \beta_0^2 + \beta_0 \beta_1 x_2 & \ldots & \beta_0^2 + \beta_0 \beta_1 x_n \\
+\beta_0 \beta_1 + \beta_1^2 x_1 & \beta_0 \beta_1 + \beta_1^2 x_2 & \ldots & \beta_0 \beta_1 + \beta_1^2 x_n 
+\end{pmatrix} \\
+&= n \begin{pmatrix}
+1 &  \overline{X} \\
+1 &  \overline{X} \\
+\vdots & \vdots \\
+1 &   \overline{X}
+\end{pmatrix} \begin{pmatrix}
+\beta_0^2 + \beta_0 \beta_1 x_1 & \beta_0^2 + \beta_0 \beta_1 x_2 & \ldots & \beta_0^2 + \beta_0 \beta_1 x_n \\
+\beta_0 \beta_1 + \beta_1^2 x_1 & \beta_0 \beta_1 + \beta_1^2 x_2 & \ldots & \beta_0 \beta_1 + \beta_1^2 x_n 
+\end{pmatrix} 
+\end{align*} 
+$$\implies \frac{1}{n}tr(J X \beta \beta' X') = n \beta_0^2 +  2 n \beta_0 \beta_1 \overline{X} + n \beta_1^2 \overline{X}^2$$
+Therefore, we see that, 
+\begin{align*}
+E[SSTO]  &= (n -1)\sigma^2 + n \beta_0^2 + 2 n \beta_0 \beta_1 \overline{X} + \beta_1^2 \sum_{i = 1}^n x_i^2 - ( n \beta_0^2 +  2 n \beta_0 \beta_1 \overline{X} + n \beta_1^2 \overline{X}^2) \\
+&= (n -1)\sigma^2 + \beta_1^2 \sum_{i = 1}^n x_i^2 - n \beta_1^2 \overline{X}^2\\
+&= (n -1)\sigma^2 + \beta_1^2 \sum_{i = 1}^n (x_i - \overline{X})^2
+\end{align*}
+\item  $SSR = Y' \left [H - \frac{1}{n}J \right ] Y$. Observe, we leverage the fact that 
+$$SSR = SSTO - SSE$$
+
+and the linearity of expectation: 
+
+$$E[SSR] = E[SSTO - SSE] =  E[SSTO] - E[SSE] = (n -1)\sigma^2 + \beta_1^2 \sum_{i = 1}^n (x_i - \overline{X})^2 - (n - 1) \sigma^2 = \beta_1^2 \sum_{i = 1}^n (x_i - \overline{X})^2$$
+\end{itemize}
+\end{solution}
+
+%\begin{problem}{2}
+%(Optional Problem.) Under the simple regression model with Normal errors, derive
+%the sampling distributions for SSR and SSTO when $\beta_1 = 0.$
+%\end{problem}
+%\begin{solution}
+%\end{solution}
+
+\begin{problem}{3}
+For each of the following models, answer whether it can be expressed as a multiple regression model or not. If so, indicate which transformations and/or new variables need to be introduced. (In the following, $\epsilon_i$'s denote the error terms and are assumed to be i.i.d. random variables.)
+\begin{enumerate}[(a)]
+\item $Y_i = \beta_0 + \beta_1 X_{i1} + \beta_2 X_{i2} + \beta_3 X_{i1}^2 + \epsilon_i$
+\item $Y_i = \epsilon_i \exp ( \beta_0 + \beta_1 X_{i1} +\beta_2 X_{i2}^2)$ with $\epsilon_i > 0$
+\item $Y_i = \beta_0 \exp(\beta_1 X_{i1}) + \epsilon_i$
+\item $Y_i = \frac{1}{1 + \exp(\beta_0 + \beta_1 X_{i1}  + \epsilon_i)}$
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item Yes. Order and interaction variable sums in X are always expressible as multiple regression models. 
+\item Yes. We can rewrite this relationship as: 
+$$Y_i =  \epsilon_i \exp ( \beta_0 + \beta_1 X_{i1} +\beta_2 X_{i2}^2) = \exp ( \beta_0 + \beta_1 X_{i1} +\beta_2 X_{i2}^2 + \ln(\epsilon_i) )$$
+which is well defined since we assume $\epsilon_i > 0. $ We can then use the transform: 
+
+$$\tilde Y_i = \ln(Y_i)$$
+So we are left with learning
+ $$\tilde Y_i =  \beta_0 + \beta_1 X_{i1} +\beta_2 X_{i2}^2 + \ln(\epsilon_i)$$
+ which is expressible as a multiple regression model since it's a polynomial. 
+\item No. Unless we can assume all of $Y_i$ is positive or negative (or sufficiently close to). Otherwise, there is no way to express this without doing the transformation: 
+
+$$\tilde Y_i = \ln(Y_i) = \ln(\beta_0) + \beta_1 X_{i1}$$
+And then we simply choose $\beta_0$ to have sign equivalent to the majority sign of $Y_i.$
+\item Yes provided $Y_i \in (0,1)$ for all $i$. Define the transformation: 
+$$\tilde Y_i = \ln \left ( \frac{1}{Y_i} - 1 \right)$$
+Then we see that
+$$\tilde Y_i = \beta_0 + \beta_1 X_{i1}  + \epsilon_i$$
+which is a polynomial in terms of $X$ and is therefore expressible! 
+\end{enumerate}
+\end{solution}
+
+
+\begin{problem}{4}
+Answer the following questions with regard to multiple regression models and provide a brief explanation.
+\begin{enumerate}[(a)]
+\item What is the maximum number of $X$ variables that can be included in a multiple regression model (with intercept) that is used to fit a data set with 10 cases?
+\item With 4 predictors, how many $X$ variables are there in the interaction model with all main effects and all interaction terms (2nd order, 3rd order, etc.)?
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item 9. Otherwise you will simply overfit your dataset. Between every 2 points, there is a unique line. Between every 10 points, there is a unique 9-dimensional hyperplane. Anything beyond and you will enter the overparametrized regime. 
+\item This is a dynamic programming problem. Observe, you simply add the previous row entry with the previous column entry to get: 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+order \textbackslash dependents & $x$ & $x,y$ & $x,y,z$ & $x,y,z,w$ \\ \hline
+1                               & 2 & 3   & 4     & 5       \\ \hline
+2                               & 3 & 6   & 10    & 15      \\ \hline
+3                               & 4 & 10  & 20    & 35      \\ \hline
+4                               & 5 & 15  & 35    & 70      \\ \hline
+5                               & 6 & 21  & 56    & 126     \\ \hline
+\end{tabular}
+\end{table}
+This is equivalent to the number of multi-combinations of choose $d$ dimension elements amongst $n$ variables (including the intercept term), which is 
+$${n + d \choose d}$$
+Therefore, setting $n = 4,$ we get: 
+$$\text{number of X variables of 4 predictors} = {4 + d \choose d}$$
+\end{enumerate}
+\end{solution}
+
+\begin{problem}{5}
+Tell true or false of the following statements with regard to multiple regression models.
+\begin{enumerate}[(a)]
+\item The multiple coefficient of determination $R^2$ is always larger/not-smaller for models with more $X$ variables.
+\item If all the regression coefficients associated with the $X$ variables are estimated to be zero, then $R^2 = 0.$
+\item The adjusted multiple coefficient of determination $R_a^2$ may decrease when adding additional $X$ variables into the model.
+\item Models with larger $R^2$ is always preferred.
+\item If the response vector is a linear combination of the columns of the design matrix $X$, then the coefficient of multiple determination $R^2 = 1.$
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item True. SSTO remains the same when introducing a new variable. 
+\item False. The response $Y = \beta_0 + \epsilon$ will yield $R^2$ greater than 0. 
+\item True. A decrease in SSE may be more than offset by the loss of degrees of freedom in SSE. 
+\item False. It may suggest overfit. 
+\item True. SSE = 0 when this is true. 
+\end{enumerate}
+\end{solution}
+
+
+\begin{problem}{6}
+Submitted as a  Markdown file. 
+\end{problem}
+
+\begin{problem}{7}
+Under the multiple regression model, show that the residuals are uncorrelated with the fitted values and the estimated regression coefficients.
+\end{problem}
+\begin{solution}
+\begin{itemize}
+\item Observe: 
+\begin{align*}
+Cov(e, \hat Y) &= Cov\left ( (I - H)Y, HY \right) \\
+&= E \left [ (I - H)(Y - \overline{Y} )(Y - \overline{Y} )^T H^T \right] \\
+&= (I - H) E \left [ (Y - \overline{Y} )(Y - \overline{Y} )^T\right]  H^T \\
+&= (I - H) Cov(Y) H^T \\
+&=(I - H) \sigma^2 I H^T\\
+&=\sigma^2 (I - H) H \\
+&= \sigma^2 (H - H) \\
+&= 0
+\end{align*}
+\item 
+\begin{align*}
+Cov(e, \hat \beta) &= Cov\left ( (I - H)Y,  (X^T X)^{-1} X^T Y \right) \\
+&= E \left [ (I - H)(Y - \overline{Y} )(Y - \overline{Y} )^T X (X^T X)^{-T}  \right] \\
+&= (I - H) E \left [ (Y - \overline{Y} )(Y - \overline{Y} )^T\right]  X (X^T X)^{-1} \\
+&= (I - H) Cov(Y)  X (X^T X)^{-1}  \\
+&=(I - H) \sigma^2 I X (X^T X)^{-1}\\
+&=\sigma^2 (I - (X^T X)^{-1} X^T) X (X^T X)^{-1} \\
+&= \sigma^2 (X (X^T X)^{-1} - (X^T X)^{-1} X^T X (X^T X)^{-1}) \\
+&= \sigma^2 (X (X^T X)^{-1} - (X^T X)^{-1} ) \\
+&= \sigma^2 (X - I) (X^T X)^{-1} \\
+\end{align*}
+Since we can choose columns in $X$ that yield a basis, we see that, $col(X) \perp  (X - I) (X^T X)^{-1}.$ Therefore, 
+$$ (X - I) (X^T X)^{-1} = 0$$
+which leaves us with 
+$$Cov(e, \hat \beta) = 0$$
+\end{itemize}
+\end{solution}
+\end{document}

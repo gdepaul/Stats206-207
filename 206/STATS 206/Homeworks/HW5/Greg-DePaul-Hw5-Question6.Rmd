@@ -1,0 +1,215 @@
+---
+title: "Homework 5"
+author: "Greg DePaul"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Matrix)
+library(psych)
+```
+
+## Problem 6 - A multiple linear regression case study by R.
+
+You need to submit your codes alongside the answers, plots, outputs, etc. You are required to use R Markdown: Please submit a .rmd file and its corresponding .html file.
+
+A commercial real estate company evaluates age ($X_1$), operating expenses ($X_2$, in thousand dollar), vacancy rate ($X_3$), total square footage ($X_4$) and rental rates ($Y$ , in thousand dollar) for commercial properties in a large metropolitan area in order to provide clients with quantitative information upon which to make rental decisions. The data are taken from 81 suburban commercial properties. (Data file: “property.txt”; 1st column – $Y$ , followed by $X_1$, $X_2$, $X_3$, $X_4$)
+
+##### (a) Read data into R. What is the type of each variable? Draw plots to depict the distribution of each variable and obtain summary statistics for each variable. Comment on the distributions of these variables.
+
+```{r read_data}
+my_data <- read.table("property.txt", header=FALSE)
+colnames(my_data) <- c('rental_rates','age','operating_expenses','vacancy_rates','square_footage')
+```
+
+We see that 
+
+- rental_rates = FLOAT
+
+- age = INT 
+
+- operating_expense = FLOAT
+
+- vacancy_rates = FLOAT
+
+- square_footage = INT
+
+```{r summarize_data}
+summary(my_data)
+
+par(mfrow = c(2, 3))
+hist(my_data$rental_rates, xlab='Rental Rates', main='Histogram of Rates')
+hist(my_data$age, xlab='Age', main='Histogram of Age')
+
+hist(my_data$operating_expenses, xlab='Operating Expenses', main='Histogram of Operating Expenses')
+hist(my_data$vacancy_rates, xlab='Vacancy Rates', main='Histogram of Vacancy Rates')
+hist(my_data$square_footage, xlab='Square Footage', main='Histogram of Square Footage')
+```
+
+##### (b) Draw the scatter plot matrix and obtain the correlation matrix. What do you observe?
+
+```{r analyze_data}
+pairs(my_data)
+cor(my_data)
+```
+
+##### (c) Perform regression of the rental rates Y on the four predictors X1, X2, X3, X4 (Model 1). What are the Least-squares estimators? Write down the fitted regression function. What are MSE, R2 and Ra2?
+
+```{r model_1}
+fit_1 = lm(rental_rates ~ age + operating_expenses + vacancy_rates + square_footage, data=my_data)
+summary(fit_1)
+```
+
+This gives us the regression: 
+
+$$\hat Y_i = 12.20059 - 0.1420336 X_1 + 0.2820165 X_2 + 0.6193435 X_3 + (7.924302e^{-06}) X_4 $$
+
+$$R^2 = 0.5847, \ \ \ R_a^2 = 0.5629$$
+
+$$\sqrt{MSE} = 1.137 \implies MSE = 1.293$$
+
+##### (d) Draw residuals vs. fitted values plot, residuals Normal Q-Q plot and residuals box- plot. Comment on the model assumptions based on these plots. (Hint: for a compact report, use par(mfrow) to create one multiple paneled plot).
+
+```{r residual_analysis}
+par(mfrow = c(2, 2))
+plot(fit_1,which=1) ##residuals vs. fitted values
+plot(fit_1,which=2) ##residuals Q-Q plot
+boxplot(fit_1$residuals) ## residuals boxplot
+```
+
+No obvious nonlinearity is scene. 
+
+##### (e) Draw residuals vs. each predictor variable plots, and residuals vs. each two-way interaction term plots. How many two-way interaction terms are there? Analyze your plots and summarize your findings.
+
+```{r individual_predictors_versus_residuals}
+par(mfrow = c(2, 2))
+plot(my_data$age,fit_1$residuals)
+plot(my_data$operating_expenses,fit_1$residuals)
+plot(my_data$vacancy_rates,fit_1$residuals)
+plot(my_data$square_footage,fit_1$residuals)
+```
+
+There should be ${4 \choose 2}= 6$ first order interation terms 
+
+```{r interaction_terms_versus_residuals}
+par(mfrow = c(2, 3))
+plot(my_data$age * my_data$operating_expenses,fit_1$residuals)
+plot(my_data$age * my_data$vacancy_rates,fit_1$residuals)
+plot(my_data$age * my_data$square_footage,fit_1$residuals)
+plot(my_data$operating_expenses * my_data$vacancy_rates,fit_1$residuals)
+plot(my_data$operating_expenses * my_data$square_footage,fit_1$residuals)
+plot(my_data$vacancy_rates * my_data$square_footage,fit_1$residuals)
+```
+
+##### (f) For each regression coefficient, test whether it is zero or not (under the Normal error model) at level 0.01. State the null and alternative hypotheses, the test statistic, its null distribution and the pvalue. Which regression coefficient(s) is (are) significant, which is/are not? What is the implication?
+
+- $H_0 : \beta_1 = 0$ 
+- $H_A : \beta_1 \not = 0$
+- Test Statistic: $T^* = \frac{\hat \beta_1 - 0}{s \{ \hat \beta_1 \}}$
+- Null distribution of $T^*$ is $t_{n - 2} = t_{82}$
+
+
+We use the two-sided $t$-test. The rule becomes is we reject $H_0$ if the following comparison is true:  
+
+$$|T^*| = | \frac{ \hat \beta_1 }{SE \{ \hat \beta_1 \}}| > t_{n - p}(1 - \frac{\alpha}{2})$$
+
+```{r test_X_1}
+n <- 81
+p <- 5
+alpha <- 0.01
+crit_val  <- qt(1 - alpha / 2, df = n - p)
+
+betas <- fit_1$coefficients
+beta_1 <- betas[2]
+s_beta_1 <- summary(fit_1)$coefficients["age","Std. Error"]
+T_star <- beta_1 / s_beta_1
+print( abs(T_star) > crit_val)
+```
+
+```{r test_X_2}
+beta_2 <- betas[3]
+s_beta_2 <- summary(fit_1)$coefficients["operating_expenses","Std. Error"]
+T_star <- beta_2 / s_beta_2
+print( abs(T_star) > crit_val)
+```
+
+```{r test_X_3}
+beta_3 <- betas[4]
+s_beta_3 <- summary(fit_1)$coefficients["vacancy_rates","Std. Error"]
+T_star <- beta_3 / s_beta_3
+print( abs(T_star) > crit_val)
+```
+
+```{r test_X_4}
+beta_4 <- betas[5]
+s_beta_4 <- summary(fit_1)$coefficients["square_footage","Std. Error"]
+T_star <- beta_4 / s_beta_4
+print( abs(T_star) > crit_val)
+```
+
+##### (g) Obtain SSTO, SSR, SSE and their degrees of freedom. Test whether there is a regression relation at α = 0.01. State the null and alternative hypotheses, the test statistic, its null distribution, the decision rule and your conclusion.
+
+```{r anova_statistics}
+SSE <- sum((fitted(fit_1) - my_data$rental_rates)^2)
+print(SSE)
+
+SSR <- sum((fitted(fit_1) - mean(my_data$rental_rates))^2)
+print(SSR)
+
+SSTO <- SSE + SSR
+print(SSTO)
+```
+
+Suppose we wanted to conduct the $F$ test to determine if there is a regression relation. Here is how we could set it up for $\alpha = 0.01$:
+
+$$H_0: \beta_1= \beta_2= \beta_3 = \beta_4 =0 \ \ \ \text{ vs } \ \ \ H_1: \text{ not all of the } \beta \text{'s are } 0$$
+
+We reject $H_0$ if $F^∗ > F(1− \alpha;p−1,n−p)$. Now, we can use R to find the critical value.
+
+In this case, $n = 81, p = 5$, so we calculate: 
+
+```{r F_test_for_regressive_model}
+alpha <- 0.01
+n <- 81
+p <- 5
+F_crit <- qf(1 - alpha, p - 1, n - p)
+```
+
+##### (h) You now decide to fit a different model by regressing the rental rates Y on three predictors X1,X2,X4 (Model 2). Why would you make such a decision? Get the Least-squares estimators and write down the fitted regression function. What are MSE, R2 and Ra2? How do these numbers compare with those from Model 1?
+
+```{r model_2}
+fit_2 = lm(rental_rates ~ age + operating_expenses + square_footage, data=my_data)
+summary(fit_2)
+```
+
+This gives us the regression: 
+
+$$\hat Y_i = 12.37 - 0.1442 X_1 + 0.2672 X_2 + (8.178e^{-06}) X_4 $$
+
+$$R^2 = 0.583, \ \ \ R_a^2 = 0.5667 $$
+
+$$\sqrt{MSE} = 1.132 \implies MSE = 1.281 $$
+
+##### (i) Compare the standard errors of the regression coefficient estimates for X1,X2,X4 under Model 2 with those under Model 1. What do you find? Construct 95% confidence intervals for regression coefficients for X1,X2,X4 under Model 2. Had these intervals been constructed under Model 1, how would their widths compare with the widths of the intervals you just constructed, i.e., being wider or narrower? Justify your answer.
+
+The standard errors are smaller than those listed under model 1. 
+
+```{r confidence}
+confint(fit_2,parm=c("age","operating_expenses", "square_footage"),level=.95)
+```
+
+We would expect these intervals to be narrower than model 1 simply because of the reduced standard errors. 
+
+##### (j) Consider a property with the following characteristics: X1 = 4,X2 = 10,X3 = 0.1, X4 = 80, 000. Construct 99% prediction intervals under Model 1 and Model 2, respectively. Compare these two sets of intervals, what do you find?
+
+```{r new_prediction_test}
+newX = data.frame(age = 4, operating_expenses = 10, vacancy_rates = 0.1, square_footage = 80000)
+predict(fit_1, newX, interval='confidence', level=0.99)
+predict(fit_2, newX, interval='confidence', level=0.99)
+```
+
+##### (k) Which of the two Models you would prefer and why?
+
+If we're attempting to use either of these models for prediction, it would be better to use a model where the confidence interval on new predictions would be smaller. Model 2 would allow us to bound our inferences better, so model 2. 

@@ -1,0 +1,218 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{enumerate,graphicx,nicefrac,amsmath,verbatim}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={STA 138 Discussion 6 -- solutions},
+  pdfauthor={Fall 2022},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{STA 138 Discussion 6 -- solutions}
+\author{Fall 2022}
+\date{}
+
+\begin{document}
+\maketitle
+
+For this discussion we will explore logistic regression models using
+\verb+wine.csv+, containing data regarding the quality of wines.
+
+He have here three variables, ``quality,'' ``SO2,'' and ``pH,'' recorded
+for each of 1599 wine samples:
+
+\begin{itemize}
+\item quality (binary): 1 if high quality, 0 otherwise
+\item SO2 (binary): 1 if high sulfur dioxide levels, 0 o.w.
+\item pH (numeric): pH of the wine
+\end{itemize}
+
+Let's let \[ x_{i1} = \begin{cases}
+1 \quad \text{ if SO2}=1\text{ for wine $i$}\\ 
+0 \quad \text{ if SO2}=0\text{ for wine $i$}\ ,
+\end{cases}\] \[ x_{i2} = \text{pH}\text{ for wine $i$}\ ,\] and
+\[x_{i3} = x_{i1}\cdot x_{i2}\ . \]
+
+\begin{enumerate}
+\item Consider the model \[\log\left(\frac{\pi_i}{1-\pi_i}\right)= \beta_0 + \beta_1 x_{i1}\ .\]
+\begin{enumerate}
+\item What are the estimated parameters for this model?
+\item Interpret the parameters.
+\end{enumerate}
+
+
+```
+## (Intercept)         SO2 
+##   -1.628836   -1.209479
+```
+
+The estimated parameters here are \[\hat\beta_0 = -1.6288362\] and \[\hat\beta_1 = -1.2094792\ .\]
+
+SO2 here is binary, and low SO2 is the `baseline' case in which $x_{i1}=0$, for which case $\beta_0$ is the log-odds of $\text{quality}_i = 1$. The estimated log-odds for low SO2 wine according to this model are $\hat\beta_0$, which corresponds to estimated odds of 0.1961577, and estimated probability of 0.1639899 of high quality for a low-SO2 wine.
+
+The estimated log-odds ratio of high quality for high SO2 vs. low SO2 wines is $\hat\beta_1$. Thus, estimated odds of high quality for high SO2 wines under this model are 0.2983526 times those of low SO2 wines.
+
+So, this model suggests that wines with low SO2 are more likely to be high quality.
+
+\item Consider the model \[\log\left(\frac{\pi_i}{1-\pi_i}\right)= \beta_0 + \beta_2 x_{i2}\ .\]
+\begin{enumerate}
+\item What are the estimated parameters for this model?
+\item Interpret the parameters.
+\item Plot both the fitted log-odds and fitted probability of high quality for wines as a function of pH.
+\end{enumerate}
+
+
+
+The estimated parameters here are \[\hat\beta_0 = 1.7774224\] and \[\hat\beta_2 = -1.0990887\ .\]
+
+pH here is continuous, and pH$=0$ is the `baseline' case, in which $x_{i2}=0$, for which case $\beta_0$ is the log-odds of $\text{quality}_i = 1$. The estimated log-odds for pH$=0$ wine according to this model are $\hat\beta_0$. This is not really interpretable in itself, because pH 0 wines would be really bad for the digestion and generally not advisable to drink, and maybe more importantly they don't exist.
+
+The estimated log-odds ratio of high quality for wines with a one-unit difference in pH's is $\hat\beta_2$. Thus, the estimated odds of high quality for a wine with pH that is one higher than that of another one under this model are 0.3331746 times those of the other.
+
+So, this model suggests that wines with higher pH's (i.e. wines that are less acidic) are less likely to be high quality than those with lower pH's (i.e. those that are more acidic) (see Figures 1 and 2 below).
+
+
+
+\end{enumerate}
+
+\begin{center}\includegraphics{STA-138-Discussion-6-solutions_files/figure-latex/unnamed-chunk-5-1} \end{center}
+
+\begin{center}\includegraphics{STA-138-Discussion-6-solutions_files/figure-latex/unnamed-chunk-6-1} \end{center}
+
+\vfill
+
+\pagebreak
+
+\subsection*{Appendix: R Script}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wine }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"wine.csv"}\NormalTok{)}
+\DocumentationTok{\#\#\#\# problem 1}
+\NormalTok{fittedModel }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(quality}\SpecialCharTok{\textasciitilde{}}\NormalTok{SO2, }\AttributeTok{family=}\NormalTok{binomial, }\AttributeTok{data=}\NormalTok{wine)}
+\NormalTok{fittedModel}\SpecialCharTok{$}\NormalTok{coefficients}
+\DocumentationTok{\#\#\#\# problem 2}
+\NormalTok{fittedModel2 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(quality}\SpecialCharTok{\textasciitilde{}}\NormalTok{pH, }\AttributeTok{family=}\NormalTok{binomial, }\AttributeTok{data=}\NormalTok{wine)}
+\NormalTok{logOdds\_2 }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x)\{}\FunctionTok{predict}\NormalTok{(fittedModel2,}\FunctionTok{data.frame}\NormalTok{(}\AttributeTok{pH=}\NormalTok{x))\}}
+\NormalTok{pi\_2 }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x)\{}\FunctionTok{plogis}\NormalTok{(}\FunctionTok{predict}\NormalTok{(fittedModel2,}\FunctionTok{data.frame}\NormalTok{(}\AttributeTok{pH=}\NormalTok{x)))\}}
+\DocumentationTok{\#\# note:}
+\DocumentationTok{\#\# In R, the logistic function is evaluated by plogis()}
+\DocumentationTok{\#\# (CDF of logistic distribution)}
+\DocumentationTok{\#\# and the logit function is evaluated by qlogis()}
+\DocumentationTok{\#\# (quantile funciton of logistic distribution)}
+\DocumentationTok{\#\# Furthermore, predict() here will give fitted log{-}odds.}
+\FunctionTok{plot}\NormalTok{(logOdds\_2,}
+     \AttributeTok{from=}\FloatTok{2.5}\NormalTok{,}
+     \AttributeTok{to=}\FloatTok{4.5}\NormalTok{,}
+     \AttributeTok{ylab=}\StringTok{"Log odds of high rating"}\NormalTok{,}
+     \AttributeTok{xlab=}\StringTok{"Wine pH"}\NormalTok{,}
+     \AttributeTok{main=}\StringTok{"Figure 1: Log odds linear in pH"}\NormalTok{)}
+\DocumentationTok{\#\# note we should plot over a range of values of pH that are represented in the sample}
+\FunctionTok{plot}\NormalTok{(pi\_2,}
+     \AttributeTok{from=}\FloatTok{2.5}\NormalTok{,}
+     \AttributeTok{to=}\FloatTok{4.5}\NormalTok{,}
+     \AttributeTok{ylab=}\StringTok{"Probability of high rating"}\NormalTok{,}
+     \AttributeTok{xlab=}\StringTok{"Wine pH"}\NormalTok{,}
+     \AttributeTok{main=}\StringTok{"Figure 2: Log odds linear in pH"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}

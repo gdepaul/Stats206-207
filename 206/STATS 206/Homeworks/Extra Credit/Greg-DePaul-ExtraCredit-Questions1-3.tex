@@ -1,0 +1,162 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not alter this block (unless you're familiar with LaTeX
+\documentclass{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amssymb,amsfonts, fancyhdr, color, comment, graphicx, environ}
+\usepackage{mathrsfs}
+
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage[shortlabels]{enumitem}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+
+
+\pagestyle{fancy}
+\usepackage{float}
+\newcommand{\aboverightarrow}[1]{\xrightarrow[]{#1}}
+
+\newenvironment{problem}[2][Problem]
+    { \begin{mdframed}[backgroundcolor=gray!20] \textbf{#1 #2} \\}
+    {  \end{mdframed}}
+
+% Define solution environment
+\newenvironment{solution}
+    {\textit{Solution:}}
+    {}
+    \newcommand{\indep}{\perp \!\!\! \perp}
+    \renewcommand\qedsymbol{$\blacksquare$}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\seminorm}[1]{\left [#1\right]}
+\newcommand{\ts}{\textsuperscript}
+\usepackage{scalerel}[2014/03/10]
+\usepackage[usestackEOL]{stackengine}
+\def\avint{\,\ThisStyle{\ensurestackMath{%
+  \stackinset{c}{.2\LMpt}{c}{.5\LMpt}{\SavedStyle-}{\SavedStyle\phantom{\int}}}%
+  \setbox0=\hbox{$\SavedStyle\int\,$}\kern-\wd0}\int}
+\def\ddashint{\,\ThisStyle{\ensurestackMath{%
+  \stackinset{c}{.2\LMpt}{c}{.5\LMpt+.2\LMex}{\SavedStyle-}{%
+    \stackinset{c}{.2\LMpt}{c}{.5\LMpt-.2\LMex}{\SavedStyle-}{%
+      \SavedStyle\phantom{\int}}}}\setbox0=\hbox{$\SavedStyle\int\,$}\kern-\wd0}\int}
+
+\newcommand{\skipline}{$ \ $}
+
+\newcommand{\reals}{\mathbb R}
+\newcommand{\ints}{\mathbb Z}
+\newcommand{\normal}{\trianglelefteq}
+\newcommand{\onormal}{\trianglerighteq}
+
+\newcommand{\subgroup}{\leqslant}
+
+\newcommand{\sigalg}{\mathscr A}
+\newcommand{\setsequence}{ \{ E_n \}_{n=1}^{\infty} }
+\newcommand{\unionsetsequence}{ \bigcup_{i=1}^{\infty}  A_i }
+\newcommand{\intersectionsetsequence}{ \bigcap_{i=1}^{\infty}  A_i }
+\newcommand{\measureablespace}{(X, \sigalg)}
+\newcommand{\measurespace}{(X, \sigalg, \mu)}
+\newcommand{\borelspace}{\mathscr{B}(X)}
+\newcommand{\lebesguemeasurespace}{(X, \borelspace, \lambda)}
+\newcommand{\schwartzspace}{\mathcal S(\mathbb R^n)}
+\newcommand{\temperedspace}{\mathcal S'(\mathbb R^n)}
+
+\newcommand{\measure}{\mu: \sigalg \rightarrow [0, + \infty]} 
+\newcommand{\outermeasure}{\mu: \mathbb{P}(X) \rightarrow [0, + \infty]} 
+\newcommand{\convergesinmeasure}{\xrightarrow[\mu]{}} 
+\newcommand{\convergesinLp}{\xrightarrow[L^p]{}} 
+
+\newcommand{\convergesinschwartz}{\xrightarrow[]{\mathcal S}} 
+
+\renewcommand{\qed}{\quad\qedsymbol}
+\setlength\parindent{0pt}
+
+% prevent line break in inline mode
+\binoppenalty=\maxdimen
+\relpenalty=\maxdimen
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fill in the appropriate information below
+\lhead{Greg DePaul}
+\rhead{Stats 206} 
+\chead{\textbf{Extra Credit Due: 9 December 2022}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{problem}{1}
+Read the following derivation with regard to the deleted residuals and then proceed with solving Problems 2 and 3.
+\end{problem}
+\begin{solution}
+\end{solution}
+
+\begin{problem}{2}
+ Studentized deleted residuals. In the following, no assumption is made on the data or the model unless it is explicitly stated.
+\begin{enumerate}[(a)]
+\item Assume the observed response vector $Y \in \mathbb R^n$ has $Var(Y) = \sigma^2 I_n$. Show that, the ??
+$i$th deleted residual $d_i = Y_i -  \hat Y_{i(i)}$ has
+$$Var(d_i) = \frac{\sigma^2}{1 - h_{ii}}$$
+\item Let
+$$SSE_{(i)} = \sum_{j : j \not = i} (Y_j - \hat Y_{j(i)})^2, \ \ \ MSE_{(i)} = \frac{SSE_{(i)}}{n - p - 1}$$
+where $Y_{j(i)}$ is the fitted value of the $j$th case under the leave-i-out fit. So $SSE_{(i)}$ and
+$MSE_{(i)}$ are the $SSE$ and $MSE$ of the leave-$i$-out fit, respectively. Show that
+
+$$SSE_{(i)} = SSE - \frac{e_i^2}{1 - h_{ii}}$$
+here $SSE, e_i, h_{ii}$ are from the regression fit using all $n$ cases.
+\item The studentized deleted residuals are defined as:
+$$t_i = \frac{d_i}{s\{d_i\}} = \frac{d_i}{\sqrt{MSE_{(i)} / (1 - h_{ii})}}, \ \ \ i = 1, \ldots, n$$
+Show that:
+$$t_i = e_i \sqrt{\frac{n - p - 1}{SSE(1 - h_{ii}) - e_i^2}}, \ \ \ i = 1, \ldots, n$$
+\item  Under the Normality assumption, i.e., $Y$ is an $n$ dimensional Normal random vector with $Var(Y) = \sigma^2 I_n$, show that $SSE_{(i)}$ is independent with $Y_i$ and $\hat Y_{i(i)}$. Therefore, $SSE_{(i)}$ is independent with $d_i$.
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item 
+$$Var \left (d_i \right) =Var \left (\frac{e_i}{1 - h_{ii}} \right)  = \frac{1}{(1 - h_{ii})^2} Var(e_i) = \frac{\sigma^2}{(1 - h_{ii})^2}$$
+\item Observe, 
+
+\begin{align*}
+SSE &=  Y^T (I - H)Y \\
+&= \tilde Y^T (I - H) \tilde Y + e_i Y^T (1 - H)Y e_i \\
+&= SSE_{(i)} - \frac{e_i^2}{1 - h_{ii}}
+\end{align*}
+\item Observe,
+\begin{align*}
+t_i &= \frac{d_i}{\sqrt{MSE_{(i)} / (1 - h_{ii})}} \\
+&= \frac{e_i}{(1 - h_{ii}) \sqrt{MSE_{(i)} / (1 - h_{ii})}} \\
+&=  \frac{e_i}{\sqrt{MSE_{(i)} (1 - h_{ii}) }} \\
+&=  \frac{e_i}{\sqrt{\frac{SSE_{(i)}}{n - p - 1} (1 - h_{ii}) }} \\
+&=  \frac{e_i}{\sqrt{\frac{SSE - \frac{e_i^2}{1 - h_{ii}}}{n - p - 1} (1 - h_{ii}) }} \\
+&=  \frac{e_i}{\sqrt{\frac{SSE(1 - h_{ii}) - e_i^2}{n - p - 1}  }} \\
+&=  e_i\sqrt{\frac{n - p - 1}{SSE(1 - h_{ii}) - e_i^2}  } \\
+\end{align*}
+\item Observe, 
+
+$$Cov(SSE_{(i)}, Y_i) = Cov(SSE, Y_i) - Cov(\frac{e_i^2}{1 - h_{ii}}, Y_i) = 0$$
+$$Cov(SSE_{(i)}, \hat Y_{i(i)}) = Cov(SSE, \hat Y_{i(i)}) - Cov(\frac{e_i^2}{1 - h_{ii}}, \hat Y_{i(i)}) = 0$$
+\end{enumerate}
+\end{solution}
+
+\begin{problem}{3}
+\textbf{Cook's distance.} The Cook's distances are defined as
+$$D_i := \frac{\sum_{j = 1}^n (\hat Y - \hat Y_{j(i)})^2}{p \times MSE}, \ \ \ i = 1, \ldots, n$$
+
+where $\hat Y_{j(i)}$ is the fitted value of the $j$th case under the leave-$i$-out fit. Show that:
+
+$$D_i = \frac{e_i^2}{p \times MSE} \frac{h_{ii}}{(1 - h_{ii})^2}$$
+
+\end{problem}
+\begin{solution}
+\begin{align*}
+D_i &= \frac{\sum_{j = 1}^n (\hat Y - \hat Y_{j(i)})^2}{p \times MSE}  \\
+&= \frac{(Y - \tilde Y)^T H (Y - \tilde Y)}{p \times MSE} \\
+&= \frac{ e_i^T/ (1 - h_{ii}) h_{ii} e_i^T/ (1 - h_{ii})}{p \times MSE} \\
+&= \frac{ e_i^2 }{p \times MSE}\frac{h_{ii}}{(1 - h_{ii})^2}
+\end{align*}
+\end{solution}
+\end{document}

@@ -1,0 +1,115 @@
+---
+title: "Homework 4"
+author: "Greg DePaul"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Matrix)
+library(psych)
+```
+
+## Problem 6 - Multiple regression by matrix algebra in R.
+
+You need to submit your codes alongside the answers, plots, outputs, etc. You are required to use R Markdown: Please submit a .rmd file and its corresponding .html file.
+
+Consider the following data set with 5 cases, one response variable $Y$ and two predictor variables $X_1$, $X_2$.
+
+| case | Y | X1 | X2 |
+|---|---|---|---|
+| 1 | -0.97 | -0.63 | -0.82 |
+| 2 | 2.51 | 0.18 | 0.49 |
+| 3 | -0.19 | -0.84 | 0.74 |
+| 4 | 6.53 | 1.60 | 0.58 |
+| 5 | 1.00 | 0.33 | -0.31 |
+
+Consider the first-order model for the following questions:
+
+##### (a) Create the design matrix $X$ and the response vector $Y$. Calculate $X′X$, $X′Y$ and $(X'X)^{-1}$.
+
+```{r read_data_1}
+Y <- c(-0.97, 2.51, -0.19, 6.53, 1.00)
+X_1 <- c(-0.63, 0.18, -0.84, 1.60, 0.33)
+X_2 <- c(-0.82, 0.49, 0.74, 0.58, -0.31)
+ones <- rep(1, length(Y))
+X <- matrix(c(ones, X_1, X_2), ncol = 3)
+print(X)
+print(Y)
+print(t(X) %*% X)
+print(t(X) %*% Y)
+print( solve( (t(X) %*% X) ) )
+```
+
+
+##### (b) Obtain the least-squares estimators $\hat \beta$.
+
+```{r first_order_estimator}
+beta <- solve(t(X) %*% X) %*% (t(X) %*% Y)
+print(beta)
+```
+
+##### (c) Obtain the hat matrix $H$. What are $rank(H)$ and $rank(I − H)$?
+
+```{r first_order_hat_matrix}
+H <- X %*% solve(t(X) %*% X) %*% t(X)
+print(H)
+print(rankMatrix(H))
+print(rankMatrix(diag(length(Y)) - H))
+```
+
+##### (d) Calculate the trace of $H$ and compare it with $rank(H)$ from part (c). What do you find?
+
+```{r first_order_hat_matrix_continued}
+print(tr(H))
+```
+
+This makes sense because 
+
+$$tr(H) = rank(X) = p = 3 = rank(H)$$
+
+##### (e) Obtain the fitted values, the residuals, SSE and MSE. What should be the degrees of freedom of SSE?
+
+```{r anova_1}
+print(X %*% beta)
+print(Y - X %*% beta)
+SSE <- sum( ( Y - X %*% beta )^2 )
+print(SSE)
+print(SSE / (length(Y) - 3))
+```
+
+We expect $$df(SSE) = n - p = 5 - 3 = 2$$
+
+Consider the nonadditive model with interaction between X1 and X2 for the following questions:
+
+##### (f) Create the design matrix. Obtain the hat matrix $H$. Find $rank(H)$ and $rank(I−H)$. Compare the ranks with those from part (c), what do you observe?
+
+```{r second_order_hat_matrix}
+X_1X_2 = X_1 * X_2
+X <- matrix(c(ones, X_1, X_2, X_1X_2), ncol = 4)
+H <- X %*% solve(t(X) %*% X) %*% t(X)
+print(rankMatrix(H))
+print(rankMatrix(diag(length(Y)) - H))
+```
+
+##### (g) Obtain the least-squares estimators $\hat \beta$.
+
+```{r second_order_nonadditive_estimator}
+beta <- solve(t(X) %*% X) %*% (t(X) %*% Y)
+print(beta)
+```
+
+##### (h) Obtain the fitted values, the residuals, SSE and MSE. What should be the degrees of freedom of SSE?
+
+```{r anova_2}
+print(X %*% beta)
+print(Y - X %*% beta)
+SSE <- sum( ( Y - X %*% beta )^2 )
+print(SSE)
+print(SSE / (length(Y) - 4))
+```
+
+##### (i) Which of the two models appears to fit the data better?
+
+The second order non-additive model appears to fit the data better based off of the decrease in SSE. But this might be because we are overfitting the data because the model complexity exceeds the number of data points available.

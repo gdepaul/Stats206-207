@@ -1,0 +1,184 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not alter this block (unless you're familiar with LaTeX
+\documentclass{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amssymb,amsfonts, fancyhdr, color, comment, graphicx, environ}
+\usepackage{mathrsfs}
+
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage[shortlabels]{enumitem}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+
+
+\pagestyle{fancy}
+\usepackage{float}
+\newcommand{\aboverightarrow}[1]{\xrightarrow[]{#1}}
+
+\newenvironment{problem}[2][Problem]
+    { \begin{mdframed}[backgroundcolor=gray!20] \textbf{#1 #2} \\}
+    {  \end{mdframed}}
+
+% Define solution environment
+\newenvironment{solution}
+    {\textit{Solution:}}
+    {}
+    \newcommand{\indep}{\perp \!\!\! \perp}
+    \renewcommand\qedsymbol{$\blacksquare$}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\seminorm}[1]{\left [#1\right]}
+\newcommand{\ts}{\textsuperscript}
+\usepackage{scalerel}[2014/03/10]
+\usepackage[usestackEOL]{stackengine}
+\def\avint{\,\ThisStyle{\ensurestackMath{%
+  \stackinset{c}{.2\LMpt}{c}{.5\LMpt}{\SavedStyle-}{\SavedStyle\phantom{\int}}}%
+  \setbox0=\hbox{$\SavedStyle\int\,$}\kern-\wd0}\int}
+\def\ddashint{\,\ThisStyle{\ensurestackMath{%
+  \stackinset{c}{.2\LMpt}{c}{.5\LMpt+.2\LMex}{\SavedStyle-}{%
+    \stackinset{c}{.2\LMpt}{c}{.5\LMpt-.2\LMex}{\SavedStyle-}{%
+      \SavedStyle\phantom{\int}}}}\setbox0=\hbox{$\SavedStyle\int\,$}\kern-\wd0}\int}
+
+\newcommand{\skipline}{$ \ $}
+
+\newcommand{\reals}{\mathbb R}
+\newcommand{\ints}{\mathbb Z}
+\newcommand{\normal}{\trianglelefteq}
+\newcommand{\onormal}{\trianglerighteq}
+
+\newcommand{\subgroup}{\leqslant}
+
+\newcommand{\sigalg}{\mathscr A}
+\newcommand{\setsequence}{ \{ E_n \}_{n=1}^{\infty} }
+\newcommand{\unionsetsequence}{ \bigcup_{i=1}^{\infty}  A_i }
+\newcommand{\intersectionsetsequence}{ \bigcap_{i=1}^{\infty}  A_i }
+\newcommand{\measureablespace}{(X, \sigalg)}
+\newcommand{\measurespace}{(X, \sigalg, \mu)}
+\newcommand{\borelspace}{\mathscr{B}(X)}
+\newcommand{\lebesguemeasurespace}{(X, \borelspace, \lambda)}
+\newcommand{\schwartzspace}{\mathcal S(\mathbb R^n)}
+\newcommand{\temperedspace}{\mathcal S'(\mathbb R^n)}
+
+\newcommand{\measure}{\mu: \sigalg \rightarrow [0, + \infty]} 
+\newcommand{\outermeasure}{\mu: \mathbb{P}(X) \rightarrow [0, + \infty]} 
+\newcommand{\convergesinmeasure}{\xrightarrow[\mu]{}} 
+\newcommand{\convergesinLp}{\xrightarrow[L^p]{}} 
+
+\newcommand{\convergesinschwartz}{\xrightarrow[]{\mathcal S}} 
+
+\renewcommand{\qed}{\quad\qedsymbol}
+\setlength\parindent{0pt}
+
+% prevent line break in inline mode
+\binoppenalty=\maxdimen
+\relpenalty=\maxdimen
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fill in the appropriate information below
+\lhead{Greg DePaul}
+\rhead{Stats 206} 
+\chead{\textbf{Homework 6  Due: 11 November 2022}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{problem}{1}
+Tell true or false of the following statements and briefly explain your answer.
+\begin{enumerate}[(a)]
+\item If the response variable is uncorrelated with all $X$ variables in the model, then the
+least-squares estimated regression coefficients of the $X$ variables are all zero.
+\item Even when the $X$ variables are perfectly correlated, we might still get a good fit of
+the data.
+\item Taking transformations of the $X$ variables as in the standardized regression model (referred to as correlation transformation) will not change coefficients of multiple determination.
+\item In a regression model, it is possible that none of the $X$ variables is statistically significant when being tested individually, while there is a significant regression relation between the response variable and the set of $X$ variables as a whole.
+\item In a regression model, it is possible that some of the $X$ variables are statistically significant when being tested individually, while there is no significant regression relation between the response variable and the set of $X$ variables as a whole.
+\item If an $X$ variable is uncorrelated with the rest of the $X$ variables, then in the standardized regression model, the variance of its least-squares estimated regression coefficient equals to the error variance.
+\item If an $X$ variable is uncorrelated with the response variable and also is uncorrelated with the rest of the $X$ variables, then its least-squares estimated regression coefficient must be zero.
+\item If the coefficient of multiple determination of regressing an $X$ variable to the rest of the $X$ variables is large, then its least-squares estimated regression coefficient tends to have large sampling variability.
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item True. $\beta = \sqrt{n - 1}S_Y r_{XX}^{-1} r_{XY} = 0$
+\item True. This is the idea of multicollinearity. 
+\item True. You have not changes the overall relationship between the explanatory and response variables. You have only scaled them. 
+\item True. A simple example is $Y = X_1 + X_2$. Only regression on one variable at a time, it's easy to get a coefficient of zero. 
+\item Mostly false. You shouldn't have a test where too many explanatory variables stop the significance of a subset. 
+\item False. It will equal $\sqrt{n - 1}S_Y$. 
+\item True. This is because the coefficient should be $\sqrt{n - 1}S_Y r_{XX}^{-1} r_{XY} e_{k}$ where $k$ is that variable. Since $ r_{XX}^{-1}  r_{XY} e_{k} = 0,$ it should drop out entirely. 
+\item False. The two concepts are independent. 
+\end{enumerate}
+\end{solution}
+
+
+\begin{problem}{2}
+When $X_1, \ldots , X_{p-1}$ are uncorrelated, show the following results. \emph{Hint: Show these results under the standardized regression model and then transform them back to the original model.}
+\begin{enumerate}[(a)]
+\item The fitted regression coefficients of regressing $Y$ on $(X_1, \ldots , X_{p - 1})$ equal to the fitted regression coefficients of regressing $Y$ on each individual $X_j$ $(j = 1, \ldots , p - 1)$ alone.
+\item  Let $X( - j) := \{ X_k : 1 \leq k \leq p - 1, k \not = j \}$. Show that $SSR(X_j | X(-j)) = SSR(X_j)$, where $SSR(X_j)$ denotes the regression sum of squares when regressing $Y$ on $X_j$ alone.
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item When the variables $X_1, \ldots, X_{p - 1}$ are uncorrelated, then 
+$$r_{XX} = I_{p - 1}$$
+Then we see that 
+
+$$\hat \beta = \begin{pmatrix}
+\overline{Y} \\
+\sqrt{n - 1} S_Y r_{XX}^{-1} r_{XY} 
+\end{pmatrix} = \begin{pmatrix}
+\overline{Y} \\
+\sqrt{n - 1} S_Y r_{XY} 
+\end{pmatrix}$$
+where each $r_{XY}$ is equal to the coefficient between each explanatory variable with the response variable. 
+\item Observe, 
+
+$$SSR(X_j | X_{(-j)}) = SSR(X_1, \ldots, X_{p - 1}) - SSR(X_{(-j)}) = SSR(X_j)$$
+I'm a little tired ... I feel like we didn't get a lot of time to finish this and do this quiz this week. 
+\end{enumerate}
+\end{solution}
+
+
+\begin{problem}{3}
+\text{Variance Inflation Factor for models with $2 X$ variables.} Show that for a model with two $X$ variables, $X_1$ and $X_2$, the variance inflation factors are
+$$VIF_1 =VIF_2 = \frac{1}{1 - R^2_1} = \frac{1}{1 - R^2_2}$$
+\emph{(Hint: Note $R_{1}^2 = R^2_2 = r^2_{12}$, where $r_{12}$ is the sample correlation coefficient between $X_1$ and $X_2$.)}
+\end{problem}
+\begin{solution}
+Observe, we see that $X_1 \sim X_2$ and $X_2 \sim X_1$ has the same coefficient of determination, specifically, 
+
+$$R_1^2 = R_2^2 = \left ( \frac{Cov(X_1, X_2)}{\sqrt{Var(X_1, X_2)}} \right)^2 = r_{12}^2$$
+
+Now, for the correlation matrix, we know that 
+
+$$r_{XX} = \begin{pmatrix}
+1 & r_{12} \\
+r_{12} & 1
+\end{pmatrix}$$
+
+Now, we see that, 
+
+$$r_{XX}^{-1} = \frac{1}{det(r_{XX})} \begin{pmatrix}
+1 & -r_{12} \\
+-r_{12} & 1
+\end{pmatrix} = \frac{1}{1 - r_{12}^2}  \begin{pmatrix}
+1 & -r_{12} \\
+-r_{12} & 1
+\end{pmatrix} = \begin{pmatrix}
+\frac{1}{1 - r_{12}^2} & \frac{-r_{12}}{1 - r_{12}^2} \\
+\frac{-r_{12}}{1 - r_{12}^2} & \frac{1}{1 - r_{12}^2}
+\end{pmatrix} $$
+
+Since $VIF_k$ are the diagonal elements, we see that, 
+
+$$VIF_1 = VIF_2 =  \frac{1}{1 - r_{12}^2} = \frac{1}{1 - R_1^2} = \frac{1}{1 - R_2^2} $$
+
+\end{solution}
+\end{document}

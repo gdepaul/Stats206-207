@@ -1,0 +1,327 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not alter this block (unless you're familiar with LaTeX
+\documentclass{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amssymb,amsfonts, fancyhdr, color, comment, graphicx, environ}
+\usepackage{mathrsfs}
+
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage[shortlabels]{enumitem}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+
+
+\pagestyle{fancy}
+
+\newcommand{\aboverightarrow}[1]{\xrightarrow[]{#1}}
+
+\newenvironment{problem}[2][Problem]
+    { \begin{mdframed}[backgroundcolor=gray!20] \textbf{#1 #2} \\}
+    {  \end{mdframed}}
+
+% Define solution environment
+\newenvironment{solution}
+    {\textit{Solution:}}
+    {}
+    
+    \renewcommand\qedsymbol{$\blacksquare$}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\seminorm}[1]{\left [#1\right]}
+\newcommand{\ts}{\textsuperscript}
+\usepackage{scalerel}[2014/03/10]
+\usepackage[usestackEOL]{stackengine}
+\def\avint{\,\ThisStyle{\ensurestackMath{%
+  \stackinset{c}{.2\LMpt}{c}{.5\LMpt}{\SavedStyle-}{\SavedStyle\phantom{\int}}}%
+  \setbox0=\hbox{$\SavedStyle\int\,$}\kern-\wd0}\int}
+\def\ddashint{\,\ThisStyle{\ensurestackMath{%
+  \stackinset{c}{.2\LMpt}{c}{.5\LMpt+.2\LMex}{\SavedStyle-}{%
+    \stackinset{c}{.2\LMpt}{c}{.5\LMpt-.2\LMex}{\SavedStyle-}{%
+      \SavedStyle\phantom{\int}}}}\setbox0=\hbox{$\SavedStyle\int\,$}\kern-\wd0}\int}
+
+\newcommand{\skipline}{$ \ $}
+
+\newcommand{\reals}{\mathbb R}
+\newcommand{\ints}{\mathbb Z}
+\newcommand{\normal}{\trianglelefteq}
+\newcommand{\onormal}{\trianglerighteq}
+
+\newcommand{\subgroup}{\leqslant}
+
+\newcommand{\sigalg}{\mathscr A}
+\newcommand{\setsequence}{ \{ E_n \}_{n=1}^{\infty} }
+\newcommand{\unionsetsequence}{ \bigcup_{i=1}^{\infty}  A_i }
+\newcommand{\intersectionsetsequence}{ \bigcap_{i=1}^{\infty}  A_i }
+\newcommand{\measureablespace}{(X, \sigalg)}
+\newcommand{\measurespace}{(X, \sigalg, \mu)}
+\newcommand{\borelspace}{\mathscr{B}(X)}
+\newcommand{\lebesguemeasurespace}{(X, \borelspace, \lambda)}
+\newcommand{\schwartzspace}{\mathcal S(\mathbb R^n)}
+\newcommand{\temperedspace}{\mathcal S'(\mathbb R^n)}
+
+\newcommand{\measure}{\mu: \sigalg \rightarrow [0, + \infty]} 
+\newcommand{\outermeasure}{\mu: \mathbb{P}(X) \rightarrow [0, + \infty]} 
+\newcommand{\convergesinmeasure}{\xrightarrow[\mu]{}} 
+\newcommand{\convergesinLp}{\xrightarrow[L^p]{}} 
+
+\newcommand{\convergesinschwartz}{\xrightarrow[]{\mathcal S}} 
+
+\renewcommand{\qed}{\quad\qedsymbol}
+\setlength\parindent{0pt}
+
+% prevent line break in inline mode
+\binoppenalty=\maxdimen
+\relpenalty=\maxdimen
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fill in the appropriate information below
+\lhead{Greg DePaul}
+\rhead{Stats 206} 
+\chead{\textbf{Homework 1  Due: 6 October 2022}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{problem}{1}
+Suppose $Z$ is an $n$-dimensional random vector with expectation $E(Z)$ and variance-covariance
+matrix:
+$$Var(Z) = Cov(Z,Z) = \Sigma$$
+Let $A$ be an $s \times n$ nonrandom matrix and $B$ a $t \times n$ nonrandom matrix. Show the following:
+\begin{enumerate}[(a)]
+\item $E(AZ) = AE(Z)$
+\item $Cov(AZ,BZ) = A\Sigma B^T$. In particular, $Var(AZ) = A\Sigma A^T .$
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item Observe, for $E[AZ] = \{ c_{i,j} \}_{(i,j) \in s \times n}$, then we see that 
+
+$$c_{i,j} = E\left [\sum_{k = 1}^n a_{i,k} z_{k, j} \right] = \sum_{k = 1}^n E\left [a_{i,k} z_{k, j} \right] = \sum_{k = 1}^n a_{i,k} E\left [z_{k, j} \right]$$
+but this is equivalent to saying 
+$$\{ c_{i,j} \}_{(i,j) \in s \times n} = A E[Z]$$
+Therefore, $E[AZ] = A E[Z]$.
+\item Recall, 
+
+$$Cov(X,Y) = E[(X - E[X])(Y - E[Y])^T]$$
+
+Observe, 
+
+\begin{align*}
+Cov(AZ,BZ) &= E[(AZ - E[AZ])(BZ - E[BZ])^T] \\
+&= E[(AZ - AE[Z])(BZ - BE[Z])^T] & \text{by Part (a)} \\
+&=  E[A(Z - E[Z])(Z - E[Z])^T B^T] \\
+&= A E[(Z - E[Z])(Z - E[Z])^T B^T] \\
+&= A E[(Z - E[Z])(Z - E[Z])^T ]B^T \\
+&= A Cov(Z,Z) B^T \\
+&= A \Sigma B^T \\
+\end{align*}
+In particular, 
+$$Var(AZ) = cov(AZ,AZ) = A Cov(Z,Z) A^T =  A \Sigma A^T$$
+\end{enumerate}
+\end{solution}
+
+
+\begin{problem}{2}
+Derive the following:
+\begin{enumerate}[(a)]
+\item $\sum_{i = 1}^n (X_i - \overline{X}) = 0, \sum_{i = 1}^n (X_i - \overline{X})^2 = \sum_{i = 1}^n (X_i - \overline{X})X_i = \sum_{i  =1}^n X_i^2 - n \overline{X}^2$
+\item $\sum_{i = 1}^n (X_i - \overline{X}) (Y_i - \overline{Y}) = \sum_{i = 1}^n (X_i - \overline{X})Y_i = \sum_{i = 1}^n X_i Y_i - n \overline{X} \ \overline{Y}$
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item  Since $\overline{X} =  \frac{1}{n}\left ( \sum_{i = 1}^n X_i \right)$
+
+\begin{align*}
+\sum_{i = 1}^n (X_i - \overline{X}) = \left ( \sum_{i = 1}^n X_i \right) - n \overline{X} =  \left ( \sum_{i = 1}^n X_i \right) -  \left ( \sum_{i = 1}^n X_i \right) = 0
+\end{align*}
+and 
+\begin{align*}
+\sum_{i = 1}^n (X_i - \overline{X})^2 &= \sum_{i = 1}^n X_i^2 - 2 X_i \overline{X} + \overline{X}^2 \\
+&=  \sum_{i = 1}^n X_i (X_i - \overline{X})  - \overline{X}( X_i  - \overline{X})\\
+&=  \sum_{i = 1}^n X_i (X_i - \overline{X})  - \overline{X} \underbrace{\sum_{i = 1}^n( X_i  - \overline{X})}_{= 0} \\
+&= \sum_{i = 1}^n X_i (X_i - \overline{X}) \\
+&= \sum_{i = 1}^n X_i^2 - \sum_{i = 1}^n X_i \overline{X} \\
+&= \sum_{i = 1}^n X_i^2 - \overline{X} \sum_{i = 1}^n X_i   \\
+&= \sum_{i = 1}^n X_i^2 -n  \overline{X}^2
+\end{align*}
+\item
+\begin{align*}
+\sum_{i = 1}^n (X_i - \overline{X}) (Y_i - \overline{Y})  &= \sum_{i = 1}^n (X_i - \overline{X}) Y_i - \overline{Y}(X_i - \overline{X})  \\
+&= \sum_{i = 1}^n (X_i - \overline{X}) Y_i - \overline{Y} \underbrace{ \sum_{i = 1}^n (X_i - \overline{X}) }_{= 0}\\
+&= \sum_{i = 1}^n (X_i - \overline{X}) Y_i\\
+&= \sum_{i = 1}^n X_i Y_i - \overline{X}  \sum_{i = 1}^n  Y_i \\
+&= \sum_{i = 1}^n X_i Y_i - n \overline{X} \ \overline{Y}
+\end{align*}
+\end{enumerate}
+\end{solution}
+
+
+\begin{problem}{3}
+Least-squares principle.
+\begin{enumerate}[(a)]
+\item State the least-squares principle.
+\item Derive the LS estimators for simple linear regression model. 
+\item Assume the observations follow:
+$$Y_i = exp(a + b X_i) + \epsilon_i, \ i = 1, \ldots, n$$
+where $a,b \in  \mathbb R$ are unknown parameters and $\epsilon_i$'s are uncorrelated random variables
+with \newline
+$E(\epsilon_i) = 0,Var(\epsilon_i) = \sigma^2$. Describe how to estimate the regression function
+(equivalently, $a,b$) by the least-squares principle. \emph{Notes:} You only need to provide
+a description. This is an example of a nonlinear regression model.
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item The least squares principle is the best fit to a set of observed data $\{ (X_i, Y_i) \}_{i = 1}^n$ by a line is equivalent to solving the minimization problem 
+$$\min_{b_0, b_1} \sum_{i = 1}^n (Y_i - (b_0 + b_1 X_i))^2$$
+\item Differentiating with respect to $b_0, b_1$, we get 
+$$\frac{\partial}{\partial b_0} \sum_{i = 1}^n (Y_i - (b_0 + b_1 X_i))^2 = \frac{\partial}{\partial b_0} \left ( b_0^2 + 2 b_0 b_1 X_i - 2 b_0 Y_i + b_1 ^2 X_i^2 - 2 b_1 X_i Y_i + Y_i^2 \right ) = \sum_{i = 1}^n (2 b_0 + 2 b_1 X_i - 2 Y_i)$$
+$$\frac{\partial}{\partial b_1} \sum_{i = 1}^n (Y_i - (b_0 + b_1 X_i))^2 = \frac{\partial}{\partial b_1} \left ( b_0^2 + 2 b_0 b_1 X_i - 2 b_0 Y_i + b_1 ^2 X_i^2 - 2 b_1 X_i Y_i + Y_i^2 \right )  = \sum_{i = 1}^n (2 b_0 X_i + 2 b_1 X_i^2 - 2 X_i Y_i )$$
+So identifying the estimators is equivalent to solving the system of equations: 
+$$\begin{cases}
+\sum_{i = 1}^n (b_0 + b_1 X_i - Y_i) \\
+ \sum_{i = 1}^n (b_0 X_i + b_1 X_i^2 - X_i Y_i) = 0
+\end{cases}$$
+Solving the first equation for $\beta_0,$ we get: 
+$$0 = \sum_{i = 1}^n (b_0 + b_1 X_i - Y_i) = n b_0 + b_1 \sum_{i = 1}^n X_i - \sum_{i = 1}^n Y_i$$
+$$\implies n b_0 = \sum_{i = 1}^n Y_i - b_1 \sum_{i = 1}^n X_i $$
+$$\implies b_0 = \overline{Y} - b_1 \overline{X}$$
+Solving the second equation for $b_0,$ we get: 
+$$0 =  \sum_{i = 1}^n (b_0 X_i + b_1 X_i^2 - X_i Y_i) = b_0 \sum_{i = 1}^n X_i + b_1 \sum_{i = 1}^n X_i^2 - \sum_{i = 1}^n X_i Y_i$$
+$$\implies b_0 \sum_{i = 1}^n X_i = \sum_{i = 1}^n X_i Y_i - b_1 \sum_{i = 1}^n X_i^2$$
+$$\implies b_0 = \frac{ \sum_{i = 1}^n X_i Y_i - b_1 \sum_{i = 1}^n X_i^2}{\sum_{i = 1}^n X_i }$$
+Setting the two equations as equal: 
+$$ \overline{Y} - b_1 \overline{X} =\frac{ \sum_{i = 1}^n X_i Y_i - b_1 \sum_{i = 1}^n X_i^2}{\sum_{i = 1}^n X_i } $$
+Solving for $b_1,$ we get:
+$$ \overline{Y} - b_1 \overline{X} =\frac{ \sum_{i = 1}^n X_i Y_i }{n \overline{X}} - b_1 \frac{\sum_{i = 1}^n X_i^2}{n \overline{X}}$$
+$$\implies b_1 \overline{X} - b_1 \frac{\sum_{i = 1}^n X_i^2}{n \overline{X}} = \overline{Y} - \frac{\sum_{i = 1}^n X_i Y_i}{n \overline{X}}$$
+$$\implies b_1 \overline{X}^2 - b_1 \frac{1}{n}\sum_{i = 1}^n X_i^2 = \overline{X}\overline{Y} - \frac{1}{n}\sum_{i = 1}^n X_i Y_i $$
+$$\implies b_1 = \frac{\overline{X}\overline{Y} - \frac{1}{n}\sum_{i = 1}^n X_i Y_i }{\overline{X}^2 - \frac{1}{n}\sum_{i = 1}^n X_i^2 }$$
+Now, simplifying, we see that 
+\begin{align*}
+b_1 &= \frac{\overline{X}\overline{Y} - \frac{1}{n}\sum_{i = 1}^n X_i Y_i }{\overline{X}^2 - \frac{1}{n}\sum_{i = 1}^n X_i^2 } \\
+&= \frac{n \overline{X}\overline{Y} - \sum_{i = 1}^n X_i Y_i }{n \overline{X}^2 - \sum_{i = 1}^n X_i^2 } \\
+&=  \frac{ \sum_{i = 1}^n X_i Y_i - n \overline{X}\overline{Y} }{ \sum_{i = 1}^n X_i^2 - n \overline{X}^2} \\
+&=  \frac{\sum_{i = 1}^n (X_i - \overline{X}) (Y_i - \overline{Y})}{ \sum_{i = 1}^n (X_i - \overline{X})^2} & \text{by Problem 2}
+\end{align*}
+\item The least squares principle is the best fit to a set of observed data $\{ (X_i, Y_i) \}_{i = 1}^n$ by a line is equivalent to solving the minimization problem 
+$$\min_{a, b \in \mathbb R} \sum_{i = 1}^n (Y_i - exp(a + b X_i))^2$$
+\end{enumerate}
+\end{solution}
+
+
+\begin{problem}{4}
+Tell true or false (with a brief explanation) of the following statements with regard to
+simple linear regression.
+\begin{enumerate}[(a)]
+\item The least squares line always passes the center of the data $(\overline{X} , \overline{Y} )$.
+\item If $\overline{X} = 0, \overline{Y} = 0$, then $\hat \beta_0 = 0$ no matter what is $\hat \beta_1$.
+\item Given the sample size, the larger the sample variance of $X_i$'s, the smaller the standard
+errors of $\hat \beta_0, \hat \beta_1$ tend to be.
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item True. This is forced by the constraint that $\hat \beta_0 = \bar Y  -\hat \beta_1 \bar X$.
+\item True. $\hat \beta_0 = \bar Y  -\hat \beta_1 \bar X = 0 - \hat \beta_1 \cdot 0 = 0.$ 
+\item True. Observe, 
+$$\sigma^2(\hat \beta_0) = \sigma^2 \left [\frac{1}{n} + \frac{\overline X^2}{\sum_{i = 1}^n (X_i - \bar X)^2} \right] \rightarrow \frac{\sigma^2}{n} \text{ as } \sum_{i = 1}^n (X_i - \bar X)^2 \rightarrow \infty$$ 
+
+$$\sigma^2(\hat \beta_1) =\frac{ \sigma^2} {\sum_{i = 1}^n (X_i - \bar X)^2}  \rightarrow 0 \text{ as } \sum_{i = 1}^n (X_i - \bar X)^2 \rightarrow \infty$$ 
+Since the variance in their distributions tend to zero, we conclude their errors must also tend to zero. 
+\end{enumerate}
+\end{solution}
+
+
+\begin{problem}{5}
+Under the simple linear regression model, recall that the
+residuals
+\begin{align*}
+\epsilon_i &= Y_i - \hat Y_i \\
+&= Y_i - ( \hat \beta_0 + \hat \beta_1 X_i) \\ 
+&= (Y_i - \overline Y ) - \hat \beta_1(X_i - \overline X).
+\end{align*}
+for $i = 1,l\dots, n.$ Show that:
+\begin{enumerate}[(a)]
+\item $\sum_{i  =1}^n e_i = 0$
+\item $\sum_{i  =1}^n X_i e_i= 0$
+\item $\sum_{i = 1}^n \hat Y_i e_i = 0$
+\end{enumerate}
+\end{problem}
+\begin{solution}
+\begin{enumerate}[(a)]
+\item 
+\begin{align*}
+\sum_{i  =1}^n e_i &= \sum_{i  =1}^n [(Y_i - \overline Y ) - \hat \beta_1(X_i - \overline X)] \\
+&=  \sum_{i  =1}^n (Y_i  -  \overline Y) - \hat \beta_1  \sum_{i  =1}^n (X_i - \overline{X})\\
+&= 0 + \hat \beta_1 0 & \text{Problem 1(a)} \\
+&= 0
+\end{align*} 
+
+\item
+
+\begin{align*}
+\sum_{i  =1}^n X_i e_i &= \sum_{i = 1}^n (X_i Y_i - X_i \overline Y ) - \hat \beta_1X_i(X_i  -  \overline X) \\
+&=  \sum_{i = 1}^n X_i (Y_i - \overline Y ) - \hat \beta_1X_i(X_i  -  \overline X)  \\
+&= \sum_{i = 1}^n X_i (Y_i - \overline Y ) - \hat \beta_1 \sum_{i = 1}^nX_i(X_i  -  \overline X)\\
+&= \sum_{i = 1}^n (X_i - \overline{X}) (Y_i - \overline Y ) - \hat \beta_1 \sum_{i = 1}^n (X_i  -  \overline X)^2 & \text{Problem 2}\\
+&= \sum_{i = 1}^n (X_i - \overline{X}) (Y_i - \overline Y ) - \left [ \frac{\sum_{i = 1}^n (X_i - \overline{X}) (Y_i - \overline{Y})}{ \sum_{i = 1}^n (X_i - \overline{X})^2} \right] \sum_{i = 1}^n (X_i  -  \overline X)^2  & \text{Problem 3(b)} \\
+&= 0
+\end{align*}
+\item Observe
+\begin{align*}
+\sum_{i  =1}^n \hat Y_i e_i &= \sum_{i  =1}^n (\beta_0 + \beta_1 X_i) e_i \\
+&= \sum_{i  =1}^n (\beta_0 e_i + \beta_1 X_i e_i)\\
+&=\beta_0 \underbrace{\sum_{i  =1}^n  e_i}_{(a) \implies 0} + \beta_1 \underbrace{ \sum_{i  =1}^n X_i e_i }_{(b) \implies 0}  \\
+&= 0 + 0 = 0
+\end{align*}
+\end{enumerate}
+\end{solution}
+
+
+\begin{problem}{6}
+Under the simple linear regression model, show that the LS estimator $\hat \beta_0$ is an unbiased
+estimator of $\beta_0$.
+\end{problem}
+\begin{solution}
+We calculate
+
+\begin{align*}
+E[\hat \beta_1 | X_1, \ldots, X_n] &=  E \left [ \frac{\sum_{i = 1}^n (X_i - \overline{X}) (Y_i - \overline{Y})}{ \sum_{i = 1}^n (X_i - \overline{X})^2} | X_1, \ldots, X_n \right] \\
+&= \frac{1}{\sum_{i = 1}^n (X_i - \overline{X})^2} E \left [ \sum_{i = 1}^n (X_i - \overline{X}) (Y_i - \overline{Y}) | X_1, \ldots, X_n\right ]\\
+&= \frac{1}{\sum_{i = 1}^n (X_i - \overline{X})^2} E \left [ \sum_{i = 1}^n (X_i - \overline{X}) (Y_i - \overline{Y})| X_1, \ldots, X_n \right ] \\
+&=  \frac{1}{\sum_{i = 1}^n (X_i - \overline{X})^2} E \left [ \sum_{i = 1}^n (X_i - \overline{X}) Y_i | X_1, \ldots, X_n \right ]  & \text{Problem 2(b)} \\
+&=  \frac{1}{\sum_{i = 1}^n (X_i - \overline{X})^2} \sum_{i = 1}^n (X_i - \overline{X})  E \left [Y_i | X_1, \ldots, X_n \right ] \\
+&=  \frac{1}{\sum_{i = 1}^n (X_i - \overline{X})^2} \sum_{i = 1}^n (X_i - \overline{X}) (\beta_0 + \beta_1 X_i) \\
+&=  \frac{\beta_0 \sum_{i = 1}^n (X_i - \overline{X})  + \beta_1 \sum_{i = 1}^n (X_i - \overline{X})X_i }{\sum_{i = 1}^n (X_i - \overline{X})^2} \\
+&=  \frac{\beta_1 \sum_{i = 1}^n (X_i - \overline{X})X_i }{\sum_{i = 1}^n (X_i - \overline{X})^2} & \text{Problem 2(a)}\\
+&=  \frac{\beta_1 \sum_{i = 1}^n (X_i - \overline{X})^2}{\sum_{i = 1}^n (X_i - \overline{X})^2} & \text{Problem 2(a)}\\
+&= \beta_1
+\end{align*} 
+
+\begin{align*}
+E[\hat \beta_0 | X_1, \ldots, X_n] &= E[\overline{Y} - \beta_1 \overline{X} | X_1,\ldots, X_n ] \\
+&= E[\frac{1}{n} \sum_{i = 1}^n Y_i - \frac{ \beta_1}{n} \sum_{i = 1}^n X_i | X_1,\ldots, X_n ]\\
+&= E[\frac{1}{n} \sum_{i = 1}^n (Y_i -  \beta_1X_i) | X_1,\ldots, X_n ]\\
+&= \frac{1}{n} \sum_{i = 1}^n E[(Y_i -  \beta_1X_i) | X_1,\ldots, X_n ]\\
+&= \frac{1}{n} \sum_{i = 1}^n (E[Y_i  | X_1,\ldots, X_n ] -  \beta_1X_i)\\
+&= \frac{1}{n} \sum_{i = 1}^n (\beta_0 + \beta_1 X_i -  \beta_1X_i)\\
+&= \frac{1}{n} \sum_{i = 1}^n \beta_0 \\
+&= \beta_0
+\end{align*}
+
+\end{solution}
+
+\begin{problem}{7}
+Submitted as a  Markdown file. 
+\end{problem}
+
+
+\end{document}

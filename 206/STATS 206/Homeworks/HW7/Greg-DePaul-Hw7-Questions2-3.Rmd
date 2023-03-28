@@ -1,0 +1,161 @@
+---
+title: "Homework 7"
+author: "Greg DePaul"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Matrix)
+library(psych)
+```
+
+## Problem 2 - Cars Exploratory Data Analysis.
+
+You need to submit your codes alongside with the answers, plots, outputs, etc. You are required to use R Markdown: Please submit a .rmd file and its corresponding .html file.
+
+##### (a) Conduct a visual inspection of the data in ”Cars.csv” and then read the data into R.
+
+```{r read_data}
+my_data <- read.csv(file = 'Cars.csv')
+```
+
+##### (b) Are there missing values? If so, replace missing values by “NA”.
+
+```{r imputation}
+my_data$horsepower = as.numeric(my_data$horsepower)
+#which(my_data$horsepower=='')
+```
+
+##### (c) Check the variable types. Which variables do you think should be treated as quantitative and which should be treated as qualitative/categorical? Fix the problems that you have identified (if any).
+
+```{r var_types}
+sapply(my_data,class)
+```
+$$\text{Quantitative: mpg, displacement, horsepower, weight, acceleration} $$
+$$\text{Categorical: cylinders, country.code}$$
+
+##### (d) Draw histogram for each quantitative variable. Comment on their distributions.
+
+```{r quantitative_vars}
+par(mfrow = c(2, 3))
+hist(my_data$mpg, xlab='mpg', main='Histogram of mpg')
+hist(my_data$displacement, xlab='displacement', main='Histogram of displacement')
+hist(as.numeric(my_data$horsepower), xlab='horsepower', main='Histogram of horsepower')
+hist(my_data$weight, xlab='weight', main='Histogram of weight')
+hist(my_data$acceleration, xlab='acceleration', main='Histogram of acceleration')
+```
+
+
+##### (e) Draw scatter plot matrix among quantitative variables with the lower panel showing correlation coefficients. Comment on their relationships.
+```{r scatter_plots}
+panel.cor <- function(x, y){
+  par(usr = c(0, 1, 0, 1))
+  r <- round(cor(x, y, use="complete.obs"), 2)
+  txt <- paste0("R = ", r)
+  cex.cor <- 0.8/strwidth(txt)
+  text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+
+mpg <- my_data$mpg
+displacement <- my_data$displacement
+horsepower <- as.numeric(my_data$horsepower)
+weight <- my_data$weight
+acceleration <- my_data$acceleration
+pairs(~ mpg + displacement + horsepower + weight + acceleration, lower.panel = panel.cor)
+```
+
+##### (f) Draw pie chart (with class percentage) for each categorical variable.
+
+```{r pie_charts}
+par(mfrow = c(1, 2))
+n <- nrow(my_data)
+pct <- round(100*table(my_data$cylinders)/n)
+lbls <- names(pct)
+vals <- as.numeric(pct)
+lab <- paste(lbls,vals, sep=' ')
+lab <- paste(lab,'%',sep='')
+pie(table(my_data$cylinders),labels=lab,col=c('blue','purple','green','yellow','red'),main='Frame: car cylinders')
+
+n <- nrow(my_data)
+pct <- round(100*table(my_data$country.code)/n)
+lbls <- names(pct)
+vals <- as.numeric(pct)
+lab <- paste(lbls,vals, sep=' ')
+lab <- paste(lab,'%',sep='')
+pie(table(my_data$country.code),labels=lab,col=c('blue','purple','green','yellow'),main='Frame: country.code')
+
+```
+
+##### (g) Draw side-by-side box plots for ”mpg” with respect to each categorical variable. What do you observe?
+```{r side_by_side_plots}
+boxplot(my_data$mpg ~ my_data$cylinders,main='mpg: side-by-side box plot by type of cylinder',
+xlab='cylinders',ylab='mpg',col=rainbow(4))
+
+boxplot(my_data$mpg ~ my_data$country.code,main='mpg: side-by-side box plot by type of country.code',
+xlab='country.code',ylab='mpg',col=rainbow(4))
+```
+
+## Problem 3 - Cars Regression with Categorical Variables.
+
+In this question, we consider models for “mpg” using “cylinders”, “horsepower”, and “weight” as predictors, where “cylinders” should be treated as a categorical variable.
+
+##### (a) Decide on whether you’d like to make any transformation of the “mpg”.
+```{r log_transform}
+my_data$logmpg <- log(my_data$mpg)
+```
+
+##### (b) Fit a first-order model with the (transformed) variables. Conduct model diagnostics. Does this model appear to be adequate?
+
+```{r first_order_model}
+my_data$cylinders.f  <- factor(my_data$cylinders)
+fit_1 = lm(logmpg ~ cylinders.f + horsepower + weight, data=my_data)
+par(mfrow = c(2, 2))
+plot(fit_1,which=1) ##residuals vs. fitted values
+plot(fit_1,which=2) ##residuals Q-Q plot
+boxplot(fit_1$residuals) ## residuals boxplot
+```
+
+##### (c) Derive the regression function for cars with 4 cylinders.
+```{r derived_regression}
+fit_1$coefficients
+```
+
+If we set $cyl = 4,$ then 
+
+$$log(mpg) \approx 3.7637094434 + 0.2664930665 -0.0026939945 \cdot horsepower -0.0001998106 \cdot weight$$
+
+
+##### (d) Fit a model including interactions between “cylinders” and “horsepower”, and “cylinders” and “weight”. Derive the regression function for cars with 4 cylinders.
+
+```{r interactions_model}
+fit_2 = lm(logmpg ~ cylinders.f + horsepower + weight + cylinders.f:horsepower + cylinders.f:weight, data=my_data)
+print(fit_2$coefficients)
+```
+
+If we set $cyl = 4,$ then 
+
+$$log(mpg) \approx -13.57939312 + 17.72135437 + 0.84061135 \cdot horsepower -0.02786500 \cdot weight -0.84607037 \cdot horsepower + 0.02771060\cdot weight + $$
+
+
+##### (e) Compare the two models using the function anova(). What do you find?
+
+```{r compare_models}
+summary(fit_1)
+anova(fit_1)
+summary(fit_2)
+anova(fit_2)
+```
+
+The interactions model isn't very necessary. That's which the coefficients are virtually identical. 
+
+##### (f) Construct a 95% prediction interval of “mpg” for a car with 4 cylinders, 100 horsepower and 3000 pounds under these two models. What do you observe?
+
+```{r prediction_intervals}
+newX = data.frame(cylinders.f = factor(4), horsepower = 100, weight = 3000)
+predict(fit_1, newX, interval='confidence', level=0.95)
+predict(fit_2, newX, interval='confidence', level=0.95)
+```
+
+To two intervals are very similar, although the interaction model yields a very slightly small interval. 
